@@ -77,8 +77,11 @@ security.php - Security utilities (CSRF, input sanitization)
 3. Root Files
 
 node_modules/ - NPM packages (Tailwind CSS). Never upload to server.
+
 package.json - NPM config (scripts for building CSS)
+
 tailwind.config.js - Tailwind configuration (which files to scan for classes)
+
 .gitignore - Tells Git what NOT to commit (secrets, node_modules)
 
 # Use Later - ignore for deployment
