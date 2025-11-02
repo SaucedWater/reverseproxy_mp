@@ -54,7 +54,7 @@ css/styles.css - Built/compiled Tailwind CSS (served to browsers)
 
 Security: ✅ Good! Only public/ is exposed to the web. Sensitive files (like config.php) are outside this folder.
 
-
+2. Src folder [[src](web_srva/src)]
 What it does: Contains files that get processed or are sensitive.
 src/css/input.css
 
@@ -75,6 +75,7 @@ db.php - Database helper functions
 security.php - Security utilities (CSRF, input sanitization)
 
 3. Root Files
+
 node_modules/ - NPM packages (Tailwind CSS). Never upload to server.
 package.json - NPM config (scripts for building CSS)
 tailwind.config.js - Tailwind configuration (which files to scan for classes)
