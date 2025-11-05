@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <main class="max-w-md mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4">Login</h1>
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label for="username" class="block text-sm font-medium">Username</label>
+        <input id="username" name="username" required class="mt-1 block w-full" />
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium">Password</label>
+        <input id="password" name="password" type="password" required class="mt-1 block w-full" />
+      </div>
+      <div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Sign in</button>
+      </div>
+    </form>
+    <p id="loginMsg" class="mt-4 text-sm text-red-600"></p>
+  </main>
+
+  <script src="../js/auth.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      // NOTE: This is a client-side stub. In real app, POST to an API.
+      const ok = await window.auth.login({ username });
+      document.getElementById('loginMsg').textContent = ok ? 'Logged in (client-side stub)' : 'Login failed';
+      if (ok) window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>
