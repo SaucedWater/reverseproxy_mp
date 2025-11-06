@@ -5,7 +5,7 @@
 Steps
 
 ## ❗ Notes
-Web Server A in -> brnach webservera
+Web Server A in -> branch webservera
 
 Web Server B in -> branch webserverb
 
