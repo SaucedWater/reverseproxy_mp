@@ -1,8 +1,8 @@
 # Mastering Reverse Proxy for Web Server Protection
-## _Group 48_
+[Group 48]
 
 ## 🛠️ Installation
-Steps
+See other branches
 
 ## ❗ Notes
 Web Server A in -> branch webservera
@@ -12,3 +12,4 @@ Web Server B in -> branch webserverb
 ## Using...
 1. Nginx
 2. Wazuh
+3. Grafana
