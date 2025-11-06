@@ -8,3 +8,7 @@ Steps
 Web Server A in -> brnach webservera
 
 Web Server B in -> branch webserverb
+
+## Using...
+1. Nginx
+2. Wazuh
