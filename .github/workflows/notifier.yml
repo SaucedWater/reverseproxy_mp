@@ -2,84 +2,53 @@ name: Discord Notifier
 
 on:
   push:
-    branches:
-      - main
-      - webservera
-      - webserverb
+    branches: [main, webservera, webserverb]
+  workflow_dispatch:
 
 jobs:
   notify:
     runs-on: ubuntu-latest
-    env:
-      WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      REPO: ${{ github.repository }}
-      BRANCH: ${{ github.ref_name }}
-      PUSHER: ${{ github.actor }}
-      COMMIT_MSG: ${{ github.event.head_commit.message || 'No commit message available' }}
-      # fallback to a reliable commit URL if head_commit.url is missing
-      COMMIT_URL: ${{ github.event.head_commit.url || format('https://github.com/{0}/commit/{1}', github.repository, github.sha) }}
     steps:
-      - name: Show debug info (safe)
+      - name: Install jq if missing
         run: |
-          echo "Repository: $REPO"
-          echo "Branch: $BRANCH"
-          echo "Pusher: $PUSHER"
-          echo "Commit message length: ${#COMMIT_MSG}"
-          # DO NOT echo $WEBHOOK or the secret value
-
-      - name: Fail early if webhook missing
-        run: |
-          if [ -z "$WEBHOOK" ]; then
-            echo "ERROR: DISCORD_WEBHOOK secret is empty. Add it under Settings -> Secrets -> Actions"
-            exit 1
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
           fi
-
-      - name: Build JSON payload (python used to avoid quoting issues)
-        run: |
-          python - <<'PY'
-import os, json
-content = (
-    f"🔔 Repo: {os.environ.get('REPO')}\n"
-    f"• Branch: {os.environ.get('BRANCH')}\n"
-    f"• By: {os.environ.get('PUSHER')}\n"
-    f"• Message: {os.environ.get('COMMIT_MSG')}"
-)
-commit_url = os.environ.get('COMMIT_URL')
-if commit_url:
-    content += f"\n• Commit: {commit_url}"
-payload = {"content": content}
-print(json.dumps(payload))
-PY
-        shell: bash
-        # capture to a file for the next step
-        id: build_payload
 
       - name: Send message to Discord
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          PUSHER: ${{ github.event.pusher.name || github.actor }}
+          MSG: ${{ github.event.head_commit.message }}
+          SHA: ${{ github.sha }}
         run: |
-          # use the python-built payload; run it through python again to output to file
-          python - <<'PY' > payload.json
-import os, json
-content = (
-    f"🔔 Repo: {os.environ.get('REPO')}\n"
-    f"• Branch: {os.environ.get('BRANCH')}\n"
-    f"• By: {os.environ.get('PUSHER')}\n"
-    f"• Message: {os.environ.get('COMMIT_MSG')}"
-)
-if os.environ.get('COMMIT_URL'):
-    content += f"\n• Commit: {os.environ.get('COMMIT_URL')}"
-print(json.dumps({"content": content}))
-PY
+          set -euo pipefail
 
-          echo "Payload preview (first 200 chars):"
-          head -c 200 payload.json || true
-          echo
-          # send and show discord's response for debugging
-          resp=$(curl -sS -w "\nHTTP_CODE:%{http_code}\n" -H "Content-Type: application/json" -X POST -d @payload.json "$WEBHOOK" || echo "__CURL_FAILED__")
-          echo "Response from Discord (or curl failure):"
-          echo "$resp"
-          # fail if curl failed or Discord returned 4xx/5xx
-          http_code=$(echo "$resp" | tr '\n' ' ' | sed -n 's/.*HTTP_CODE:\([0-9][0-9][0-9]\).*/\1/p')
-          if [ -z "$http_code" ] || [ "$http_code" -ge 400 ]; then
-            echo "Discord webhook POST failed with HTTP code: ${http_code:-N/A}"
+          if [ -z "${WEBHOOK:-}" ]; then
+            echo "DISCORD_WEBHOOK secret is missing or not accessible to this run."
+            echo "Check Settings → Secrets and variables → Actions → Secrets."
             exit 1
           fi
+
+          MSG="${MSG:-No commit message}"
+          COMMIT_URL="https://github.com/$REPO/commit/$SHA"
+
+          payload=$(jq -n -c \
+            --arg repo "$REPO" \
+            --arg branch "$BRANCH" \
+            --arg pusher "$PUSHER" \
+            --arg msg "$MSG" \
+            --arg url "$COMMIT_URL" \
+            '{content: "🔔 Repo: \($repo)\n• Branch: \($branch)\n• By: \($pusher)\n• Message: \($msg)\n• Commit: \($url)"}')
+
+          # ask Discord to return a response for easier debugging
+          URL="$WEBHOOK"
+          case "$URL" in
+            *\?*) URL="$URL&wait=true" ;;
+            *)    URL="$URL?wait=true" ;;
+          esac
+
+          curl -fsS -H "Content-Type: application/json" -d "$payload" "$URL"
