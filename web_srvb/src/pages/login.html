@@ -99,11 +99,32 @@
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const username = document.getElementById('username').value;
-      // NOTE: This is a client-side stub. In real app, POST to an API.
+      const password = document.getElementById('password').value;
+      
+      // VULNERABILITY: Simulating SQL injection vulnerability
+      // In a real scenario, this would be on the backend so just testing for now
+      const simulatedQuery = `SELECT * FROM users WHERE username='${username}' AND password='${password}'`;
+      
+      document.getElementById('loginMsg').textContent = 
+        `Query executed: ${simulatedQuery}`;
+      document.getElementById('loginMsg').className = 'mt-4 text-sm text-left bg-gray-100 p-3 rounded text-gray-700 font-mono text-xs';
+      
+      // Show its vulnerable to: ' OR '1'='1' --
+      if (username.includes("'") || password.includes("'")) {
+        document.getElementById('loginMsg').innerHTML += 
+          '<br><span class="text-red-600 font-bold"> SQL Injection Detected!</span>';
+      }
+      
+      // Still attempt login
       const ok = await window.auth.login({ username });
-      document.getElementById('loginMsg').textContent = ok ? 'Logged in (client-side stub)' : 'Login failed';
-      if (ok) window.location.href = 'dashboard.html';
+      if (ok) {
+        setTimeout(() => window.location.href = 'dashboard.html', 2000);
+      }
     });
   </script>
+  <!--Can test with Username: ' OR '1'='1' --
+                    Password: password
+  -->
+
 </body>
 </html>

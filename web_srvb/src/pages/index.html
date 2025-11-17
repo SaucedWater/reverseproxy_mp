@@ -37,6 +37,37 @@
     </div>
   </section>
 
+  <!--Cross-site scripting XSS) (Reflected/One time)-->
+  <section class="bg-white py-12">
+  <div class="max-w-6xl mx-auto px-4">
+    <h3 class="text-2xl font-bold mb-4 text-center text-purple-600">Search Our Site</h3>
+    <form action="" method="GET" class="max-w-2xl mx-auto" onsubmit="return true;">
+      <input 
+        type="text" 
+        name="search" 
+        class="w-full border-2 border-gray-200 rounded-lg px-4 py-2"
+        placeholder="Search..."
+      >
+      <button type="submit" class="mt-2 bg-purple-600 text-white px-6 py-2 rounded-lg">Search</button>
+    </form>
+    <div id="searchResults" class="mt-4 text-center"></div>
+  </div>
+</section>
+
+<script>
+  // VULNERABILITY: Directly inserting user input without sanitization
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchQuery = urlParams.get('search');
+  if (searchQuery) {
+    // XSS VULNERABILITY - directly writing user input to innerHTML
+    document.getElementById('searchResults').innerHTML = 
+      `<p class="text-gray-700">You searched for: <strong>${searchQuery}</strong></p>`;
+  }
+</script>
+<!--Test with: ?search=<script>alert('XSS')</script> or ?search=<img src=x onerror=alert('XSS')>
+-->
+
+
   <!-- About Section -->
   <section id="about" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20 shadow-2xl">
     <div class="max-w-6xl mx-auto px-4">
@@ -100,32 +131,107 @@
   </section>
 
   <!-- Contact Section -->
-  <section id="contact" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20 shadow-2xl">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="bg-white rounded-2xl shadow-2xl p-8">
-        <h2 class="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Contact Us</h2>
-        <div class="max-w-2xl mx-auto">
-          <form class="space-y-4">
-            <div>
-              <label class="block text-gray-700 mb-2 font-semibold">Name</label>
-              <input type="text" class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-purple-500 focus:outline-none transition-colors" placeholder="Your Name">
-            </div>
-            <div>
-              <label class="block text-gray-700 mb-2 font-semibold">Email</label>
-              <input type="email" class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-purple-500 focus:outline-none transition-colors" placeholder="yourname@email.com">
-            </div>
-            <div>
-              <label class="block text-gray-700 mb-2 font-semibold">Message</label>
-              <textarea class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 h-32 focus:border-purple-500 focus:outline-none transition-colors" placeholder="Your message..."></textarea>
-            </div>
-            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
-              Send Message
-            </button>
-          </form>
-        </div>
+<section id="contact" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20 shadow-2xl">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+        Contact Us
+      </h2>
+
+      <div class="max-w-2xl mx-auto">
+        <form class="space-y-4">
+          <div>
+            <label class="block text-gray-700 mb-2 font-semibold">Name</label>
+            <input 
+              type="text" 
+              class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-purple-500 focus:outline-none transition-colors" 
+              placeholder="Your Name"
+            >
+          </div>
+
+          <div>
+            <label class="block text-gray-700 mb-2 font-semibold">Email</label>
+            <input 
+              type="email" 
+              class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-purple-500 focus:outline-none transition-colors" 
+              placeholder="yourname@email.com"
+            >
+          </div>
+
+          <div>
+            <label class="block text-gray-700 mb-2 font-semibold">Message</label>
+            <textarea 
+              class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 h-32 text-gray-900 focus:border-purple-500 focus:outline-none transition-colors" 
+              placeholder="Your message..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+            Send Message
+          </button>
+        </form>
       </div>
     </div>
-  </section>
+  </div>
+
+  <!-- Stored XSS Demo Script -->
+  <script>
+    // Fake database (stored XSS demonstration)
+    let messages = [];
+
+    document.querySelector('#contact form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = this.querySelector('input[type="text"]').value;
+      const email = this.querySelector('input[type="email"]').value;
+      const message = this.querySelector('textarea').value;
+
+      // VULNERABLE: Storing unsanitized inputs
+      messages.push({ name, email, message });
+
+      // Display messages
+      displayMessages();
+
+      this.reset();
+    });
+
+    function displayMessages() {
+      const formContainer = document.querySelector('#contact .max-w-2xl');
+
+      // Remove existing message area
+      const existing = document.querySelector('.message-display');
+      if (existing) existing.remove();
+
+      // Create new message container
+      const resultsDiv = document.createElement('div');
+      resultsDiv.className = 'mt-8 space-y-4 message-display';
+      resultsDiv.innerHTML = `
+        <h3 class="text-xl font-bold text-purple-600">Recent Messages:</h3>
+      `;
+
+      // XSS happens here (user input is inserted directly)
+      messages.forEach(msg => {
+        resultsDiv.innerHTML += `
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="font-semibold text-gray-800">${msg.name}</p>
+            <p class="text-sm text-gray-600">${msg.email}</p>
+            <p class="text-gray-700 mt-2">${msg.message}</p>
+          </div>
+        `;
+      });
+
+      formContainer.appendChild(resultsDiv);
+    }
+  </script>
+</section>
+
+<!-- TEST PAYLOAD
+Name: <img src=x onerror=window.location='https://google.com'>
+Email: test@test.com
+Message: test
+//If it brings you to google website it proves that XSS works
+-->
+
 
   <!-- Footer -->
   <footer class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white py-8 shadow-2xl">
@@ -146,12 +252,6 @@
           behavior: 'smooth'
         });
       });
-    });
-
-    // Form submission handler
-    document.querySelector('form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert('Thank you for your message!');
     });
   </script>
 </body>
