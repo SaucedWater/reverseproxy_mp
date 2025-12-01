@@ -4,86 +4,481 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Web Server A</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    /* Navigation Bar */
+    nav {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: #374151;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #9333ea;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      color: white;
+      padding: 5rem 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero button {
+      background: white;
+      color: #9333ea;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+    }
+
+    .hero button:hover {
+      background: #f3f4f6;
+      transform: scale(1.05);
+    }
+
+    /* Search Section */
+    .search-section {
+      background: white;
+      padding: 3rem 2rem;
+    }
+
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .search-section h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #9333ea;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .search-form {
+      max-width: 672px;
+      margin: 0 auto;
+    }
+
+    .search-form input {
+      width: 100%;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+
+    .search-form button {
+      margin-top: 0.5rem;
+      background: #9333ea;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    #searchResults {
+      margin-top: 1rem;
+      text-align: center;
+      color: #374151;
+    }
+
+    /* About Section */
+    .about-section {
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      padding: 5rem 2rem;
+      color: white;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .about-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+    }
+
+    .about-card h2 {
+      font-size: 1.875rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 2rem;
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .about-text {
+      color: #374151;
+    }
+
+    .about-text p {
+      margin-bottom: 1rem;
+    }
+
+    .about-image {
+      background: linear-gradient(135deg, #ddd6fe, #c7d2fe);
+      height: 16rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .about-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Services Section */
+    .services-section {
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      padding: 5rem 2rem;
+      color: white;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .services-section h2 {
+      font-size: 1.875rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .service-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .service-card:hover {
+      transform: scale(1.05);
+    }
+
+    .service-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .service-card h3 {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #9333ea;
+      margin-bottom: 0.5rem;
+    }
+
+    .service-card p {
+      color: #4b5563;
+    }
+
+    /* Contact Section */
+    .contact-section {
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      padding: 5rem 2rem;
+      color: white;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .contact-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+    }
+
+    .contact-card h2 {
+      font-size: 1.875rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 3rem;
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .contact-form {
+      max-width: 672px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      color: #111827;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #9333ea;
+    }
+
+    .form-group textarea {
+      height: 8rem;
+      resize: vertical;
+    }
+
+    .contact-form button {
+      width: 100%;
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+    }
+
+    .contact-form button:hover {
+      background: linear-gradient(to right, #7e22ce, #4338ca);
+      transform: scale(1.05);
+    }
+
+    .message-display {
+      margin-top: 2rem;
+    }
+
+    .message-display h3 {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #9333ea;
+      margin-bottom: 1rem;
+    }
+
+    .message-item {
+      background: #f9fafb;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .message-item .name {
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .message-item .email {
+      font-size: 0.875rem;
+      color: #4b5563;
+    }
+
+    .message-item .text {
+      color: #374151;
+      margin-top: 0.5rem;
+    }
+
+    /* Footer */
+    footer {
+      background: linear-gradient(to right, #581c87, #312e81);
+      color: white;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    footer p {
+      margin: 0.5rem 0;
+    }
+
+    .footer-subtitle {
+      color: #ddd6fe;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .hero h2 {
+        font-size: 2rem;
+      }
+
+      .services-grid,
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen">
+<body>
   
   <!-- Navigation Bar -->
-  <nav class="bg-white/95 backdrop-blur-sm shadow-lg sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-4">
-      <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">WebServerA</h1>
-        <div class="space-x-6">
-          <a href="#home" class="text-gray-700 hover:text-purple-600 font-semibold transition-colors">Home</a>
-          <a href="#about" class="text-gray-700 hover:text-purple-600 font-semibold transition-colors">About</a>
-          <a href="#services" class="text-gray-700 hover:text-purple-600 font-semibold transition-colors">Services</a>
-          <a href="#contact" class="text-gray-700 hover:text-purple-600 font-semibold transition-colors">Contact</a>
-          <a href="./login.html" class="text-gray-700 hover:text-purple-600 font-semibold transition-colors">Login</a>
-        </div>
+  <nav>
+    <div class="nav-container">
+      <h1 class="nav-logo">WebServerA</h1>
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+        <a href="./login.html">Login</a>
       </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <section id="home" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20 shadow-2xl">
-    <div class="max-w-6xl mx-auto px-4 text-center">
-      <h2 class="text-5xl font-bold mb-4">Welcome to WebServer A</h2>
-      <p class="text-xl mb-8">Hello World! Web Server A</p>
-      <button class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg">
-        Get Started
-      </button>
+  <section id="home" class="hero">
+    <div class="hero-container">
+      <h2>Welcome to WebServer A</h2>
+      <p>Hello World! Web Server A</p>
+      <button>Get Started</button>
     </div>
   </section>
 
-  <!--Cross-site scripting XSS) (Reflected/One time)-->
-  <section class="bg-white py-12">
-  <div class="max-w-6xl mx-auto px-4">
-    <h3 class="text-2xl font-bold mb-4 text-center text-purple-600">Search Our Site</h3>
-    <form action="" method="GET" class="max-w-2xl mx-auto" onsubmit="return true;">
-      <input 
-        type="text" 
-        name="search" 
-        class="w-full border-2 border-gray-200 rounded-lg px-4 py-2"
-        placeholder="Search..."
-      >
-      <button type="submit" class="mt-2 bg-purple-600 text-white px-6 py-2 rounded-lg">Search</button>
-    </form>
-    <div id="searchResults" class="mt-4 text-center"></div>
-  </div>
-</section>
+  <!-- Cross-site scripting (XSS) (Reflected/One time) -->
+  <section class="search-section">
+    <div class="section-container">
+      <h3>Search Our Site</h3>
+      <form action="" method="GET" class="search-form" onsubmit="return true;">
+        <input 
+          type="text" 
+          name="search" 
+          placeholder="Search..."
+        >
+        <button type="submit">Search</button>
+      </form>
+      <div id="searchResults"></div>
+    </div>
+  </section>
 
-<script>
-  // VULNERABILITY: Directly inserting user input without sanitization
-  const urlParams = new URLSearchParams(window.location.search);
-  const searchQuery = urlParams.get('search');
-  if (searchQuery) {
-    // XSS VULNERABILITY - directly writing user input to innerHTML
-    document.getElementById('searchResults').innerHTML = 
-      `<p class="text-gray-700">You searched for: <strong>${searchQuery}</strong></p>`;
-  }
-</script>
-<!--Test with: ?search=<script>alert('XSS')</script> or ?search=<img src=x onerror=alert('XSS')>
--->
+  <script>
+    // VULNERABILITY: Directly inserting user input without sanitization
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+      // XSS VULNERABILITY - directly writing user input to innerHTML
+      document.getElementById('searchResults').innerHTML = 
+        `<p>You searched for: <strong>${searchQuery}</strong></p>`;
+    }
+  </script>
+  <!-- Test with: ?search=<script>alert('XSS')</script> or ?search=<img src=x onerror=alert('XSS')> -->
 
   <!-- About Section -->
-  <section id="about" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20 shadow-2xl">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="bg-white rounded-2xl shadow-2xl p-8">
-        <h2 class="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">About Us</h2>
-        <div class="grid md:grid-cols-2 gap-8">
-          <div>
-            <p class="text-gray-700 mb-4">
+  <section id="about" class="about-section">
+    <div class="section-container">
+      <div class="about-card">
+        <h2>About Us</h2>
+        <div class="about-grid">
+          <div class="about-text">
+            <p>
               Hi this is the details section about the website but i dont know what to put here.
             </p>
-            <p class="text-gray-700">
+            <p>
               Im just trying random things for now for the website
             </p>
           </div>
-          <div class="bg-gradient-to-br from-purple-200 to-indigo-200 h-64 rounded-lg overflow-hidden shadow-lg">
+          <div class="about-image">
             <img 
               src="https://tfipost.com/wp-content/uploads/2022/04/Shinchan_in_hindi_dubbed_show.jpg" 
-              alt="random image" 
-              class="w-full h-full object-cover"
+              alt="random image"
             >
           </div>
         </div>
@@ -92,34 +487,34 @@
   </section>
 
   <!-- Services Section -->
-  <section id="services" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20 shadow-2xl">
-    <div class="max-w-6xl mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-12 text-white">Our Services</h2>
-      <div class="grid md:grid-cols-3 gap-8">
+  <section id="services" class="services-section">
+    <div class="section-container">
+      <h2>Our Services</h2>
+      <div class="services-grid">
         
         <!-- Service 1 -->
-        <div class="bg-white p-6 rounded-2xl shadow-2xl hover:transform hover:scale-105 transition-all duration-200">
-          <div class="text-4xl mb-4">📱</div>
-          <h3 class="text-xl font-bold mb-2 text-purple-600">Web Design</h3>
-          <p class="text-gray-600">
+        <div class="service-card">
+          <div class="icon">📱</div>
+          <h3>Web Design</h3>
+          <p>
             Creating beautiful and responsive websites for all devices.
           </p>
         </div>
 
         <!-- Service 2 -->
-        <div class="bg-white p-6 rounded-2xl shadow-2xl hover:transform hover:scale-105 transition-all duration-200">
-          <div class="text-4xl mb-4">💻</div>
-          <h3 class="text-xl font-bold mb-2 text-purple-600">Development</h3>
-          <p class="text-gray-600">
+        <div class="service-card">
+          <div class="icon">💻</div>
+          <h3>Development</h3>
+          <p>
             Building functional websites with modern technologies.
           </p>
         </div>
 
         <!-- Service 3 -->
-        <div class="bg-white p-6 rounded-2xl shadow-2xl hover:transform hover:scale-105 transition-all duration-200">
-          <div class="text-4xl mb-4">🚀</div>
-          <h3 class="text-xl font-bold mb-2 text-purple-600">Deployment</h3>
-          <p class="text-gray-600">
+        <div class="service-card">
+          <div class="icon">🚀</div>
+          <h3>Deployment</h3>
+          <p>
             Launching and maintaining websites on the internet.
           </p>
         </div>
@@ -127,114 +522,104 @@
     </div>
   </section>
 
-<!-- Contact Section -->
-<section id="contact" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20 shadow-2xl">
-  <div class="max-w-6xl mx-auto px-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-8">
-      <h2 class="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-        Contact Us
-      </h2>
+  <!-- Contact Section -->
+  <section id="contact" class="contact-section">
+    <div class="section-container">
+      <div class="contact-card">
+        <h2>Contact Us</h2>
 
-      <div class="max-w-2xl mx-auto">
-        <form class="space-y-4">
-          <div>
-            <label class="block text-gray-700 mb-2 font-semibold">Name</label>
-            <input 
-              type="text" 
-              class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-purple-500 focus:outline-none transition-colors" 
-              placeholder="Your Name"
-            >
-          </div>
+        <div class="contact-form">
+          <form>
+            <div class="form-group">
+              <label>Name</label>
+              <input 
+                type="text" 
+                placeholder="Your Name"
+              >
+            </div>
 
-          <div>
-            <label class="block text-gray-700 mb-2 font-semibold">Email</label>
-            <input 
-              type="email" 
-              class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-purple-500 focus:outline-none transition-colors" 
-              placeholder="yourname@email.com"
-            >
-          </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input 
+                type="email" 
+                placeholder="yourname@email.com"
+              >
+            </div>
 
-          <div>
-            <label class="block text-gray-700 mb-2 font-semibold">Message</label>
-            <textarea 
-              class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 h-32 text-gray-900 focus:border-purple-500 focus:outline-none transition-colors" 
-              placeholder="Your message..."
-            ></textarea>
-          </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea 
+                placeholder="Your message..."
+              ></textarea>
+            </div>
 
-          <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
-            Send Message
-          </button>
-        </form>
+            <button type="submit">Send Message</button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Stored XSS Demo Script -->
-  <script>
-    // Fake database (stored XSS demonstration)
-    let messages = [];
+    <!-- Stored XSS Demo Script -->
+    <script>
+      // Fake database (stored XSS demonstration)
+      let messages = [];
 
-    document.querySelector('#contact form').addEventListener('submit', function (e) {
-      e.preventDefault();
+      document.querySelector('#contact form').addEventListener('submit', function (e) {
+        e.preventDefault();
 
-      const name = this.querySelector('input[type="text"]').value;
-      const email = this.querySelector('input[type="email"]').value;
-      const message = this.querySelector('textarea').value;
+        const name = this.querySelector('input[type="text"]').value;
+        const email = this.querySelector('input[type="email"]').value;
+        const message = this.querySelector('textarea').value;
 
-      // VULNERABLE: Storing unsanitized inputs
-      messages.push({ name, email, message });
+        // VULNERABLE: Storing unsanitized inputs
+        messages.push({ name, email, message });
 
-      // Display messages
-      displayMessages();
+        // Display messages
+        displayMessages();
 
-      this.reset();
-    });
-
-    function displayMessages() {
-      const formContainer = document.querySelector('#contact .max-w-2xl');
-
-      // Remove existing message area
-      const existing = document.querySelector('.message-display');
-      if (existing) existing.remove();
-
-      // Create new message container
-      const resultsDiv = document.createElement('div');
-      resultsDiv.className = 'mt-8 space-y-4 message-display';
-      resultsDiv.innerHTML = `
-        <h3 class="text-xl font-bold text-purple-600">Recent Messages:</h3>
-      `;
-
-      // XSS happens here (user input is inserted directly)
-      messages.forEach(msg => {
-        resultsDiv.innerHTML += `
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="font-semibold text-gray-800">${msg.name}</p>
-            <p class="text-sm text-gray-600">${msg.email}</p>
-            <p class="text-gray-700 mt-2">${msg.message}</p>
-          </div>
-        `;
+        this.reset();
       });
 
-      formContainer.appendChild(resultsDiv);
-    }
-  </script>
-</section>
+      function displayMessages() {
+        const formContainer = document.querySelector('.contact-form');
 
-<!-- TEST PAYLOAD
-Name: <img src=x onerror=window.location='https://google.com'>
-Email: test@test.com
-Message: test
-//If it brings you to google website it proves that XSS works
--->
+        // Remove existing message area
+        const existing = document.querySelector('.message-display');
+        if (existing) existing.remove();
 
+        // Create new message container
+        const resultsDiv = document.createElement('div');
+        resultsDiv.className = 'message-display';
+        resultsDiv.innerHTML = `<h3>Recent Messages:</h3>`;
+
+        // XSS happens here (user input is inserted directly)
+        messages.forEach(msg => {
+          resultsDiv.innerHTML += `
+            <div class="message-item">
+              <p class="name">${msg.name}</p>
+              <p class="email">${msg.email}</p>
+              <p class="text">${msg.message}</p>
+            </div>
+          `;
+        });
+
+        formContainer.appendChild(resultsDiv);
+      }
+    </script>
+  </section>
+
+  <!-- TEST PAYLOAD
+  Name: <img src=x onerror=window.location='https://google.com'>
+  Email: test@test.com
+  Message: test
+  //If it brings you to google website it proves that XSS works
+  -->
 
   <!-- Footer -->
-  <footer class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white py-8 shadow-2xl">
-    <div class="max-w-6xl mx-auto px-4 text-center">
+  <footer>
+    <div class="section-container">
       <p>&copy; MP 2025</p>
-      <p class="text-purple-200 mt-2">Made with HTML + TailwindCSS + JS</p>
+      <p class="footer-subtitle">Made with HTML + CSS + JS</p>
     </div>
   </footer>
 
@@ -249,7 +634,6 @@ Message: test
         });
       });
     });
-
   </script>
 </body>
 </html>
