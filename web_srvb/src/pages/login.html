@@ -347,43 +347,59 @@
 
   <script type="module" src="/js/auth.js"></script>
   <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const msgElement = document.getElementById('loginMsg');
+    
+    // Show loading
+    msgElement.textContent = 'Logging in...';
+    msgElement.className = 'query-display';
+    
+    try {
+      // Call vulnerable API endpoint
+      const response = await fetch('/api/login-vulnerable', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
       
-      // VULNERABILITY: Simulating SQL injection vulnerability
-      // In a real scenario, this would be on the backend so just testing for now
-      const simulatedQuery = `SELECT * FROM users WHERE username='${username}' AND password='${password}'`;
+      const data = await response.json();
       
-      const msgElement = document.getElementById('loginMsg');
-      msgElement.textContent = `Query executed: ${simulatedQuery}`;
-      msgElement.className = 'query-display';
+      // Display the SQL query
+      msgElement.innerHTML = `<strong>SQL Query Executed:</strong><br>
+        <code style="color: #3b82f6;">${data.query || 'N/A'}</code>`;
       
-      // Show its vulnerable to: ' OR '1'='1' --
-      if (username.includes("'") || password.includes("'")) {
-        msgElement.innerHTML += 
-          '<br><span class="sql-injection-warning"> SQL Injection Detected!</span>';
-      }
-      
-      // Still attempt login
-      if (window.auth && window.auth.login) {
-        const ok = await window.auth.login({ username });
-        if (ok) {
-          setTimeout(() => window.location.href = 'dashboard.html', 2000);
+      if (data.success) {
+        // Check for SQL injection
+        if (username.includes("'") || username.includes("--") || 
+            username.toLowerCase().includes(" or ") || username.toLowerCase().includes("union")) {
+          msgElement.innerHTML += '<br><br><span class="sql-injection-warning">⚠️ SQL INJECTION DETECTED!</span>';
+          msgElement.innerHTML += '<br><span style="color: #10b981; font-weight: bold;">✓ Authentication bypassed!</span>';
+          msgElement.innerHTML += '<br><span style="color: #10b981;">✓ Logged in as: ' + data.user.username + '</span>';
+        } else {
+          msgElement.innerHTML += '<br><br><span style="color: #10b981; font-weight: bold;">✓ Login successful!</span>';
+          msgElement.innerHTML += '<br>Welcome, ' + data.user.username + '!';
         }
-      } else {
-        // Fallback if auth.js not loaded
-        console.log('Login attempted with:', username);
-        msgElement.innerHTML += '<br><span style="color: #16a34a; font-weight: bold;">✓ Login successful (demo mode)</span>';
+        
+        // Redirect to dashboard after 2 seconds
         setTimeout(() => {
           window.location.href = 'dashboard.html';
         }, 2000);
+      } else {
+        msgElement.innerHTML += '<br><br><span style="color: #ef4444; font-weight: bold;">✗ Login failed</span>';
+        msgElement.innerHTML += '<br>' + data.message;
       }
-    });
-  </script>
-  <!--Can test with Username: ' OR '1'='1' --
-                    Password: password
-  -->
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      msgElement.innerHTML = '<span style="color: #ef4444;">Error connecting to server: ' + error.message + '</span>';
+    }
+  });
+</script>
 </body>
 </html>
