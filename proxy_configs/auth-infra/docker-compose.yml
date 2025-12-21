@@ -13,11 +13,9 @@ services:
       KC_HOSTNAME_URL: https://auth.dev.org/auth
     ports:
       - "8080:8080"
-    # --- FIX 1: PERSISTENCE (Saves data to a folder named 'keycloak_data') ---
     volumes:
       - ./keycloak_data:/opt/keycloak/data/
       - ./keycloak_themes/mytheme:/opt/keycloak/themes/mytheme
-    # --- FIX 2: DNS (Lets Keycloak see your Nginx URL) ---
     extra_hosts:
       - "auth.dev.org:192.168.1.10"
       - "www.dev.org:192.168.1.10"
@@ -32,7 +30,6 @@ services:
       - "4180:4180"
     depends_on:
       - keycloak
-    # --- FIX 2: DNS (Lets Proxy see Keycloak via Nginx) ---
     extra_hosts:
       - "auth.dev.org:172.17.0.1"
       - "www.dev.org:172.17.0.1"
