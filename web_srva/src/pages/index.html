@@ -4,409 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Web Server A</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      min-height: 100vh;
-      color: #333;
-    }
-
-    /* Navigation Bar */
-    nav {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .nav-logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-    }
-
-    .nav-links a {
-      color: #374151;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
-
-    .nav-links a:hover {
-      color: #9333ea;
-    }
-
-    /* Hero Section */
-    .hero {
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      color: white;
-      padding: 5rem 2rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    .hero-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .hero h2 {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
-    }
-
-    .hero button {
-      background: white;
-      color: #9333ea;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s;
-    }
-
-    .hero button:hover {
-      background: #f3f4f6;
-      transform: scale(1.05);
-    }
-
-    /* Search Section */
-    .search-section {
-      background: white;
-      padding: 3rem 2rem;
-    }
-
-    .section-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .search-section h3 {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #9333ea;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    .search-form {
-      max-width: 672px;
-      margin: 0 auto;
-    }
-
-    .search-form input {
-      width: 100%;
-      border: 2px solid #e5e7eb;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-    }
-
-    .search-form button {
-      margin-top: 0.5rem;
-      background: #9333ea;
-      color: white;
-      padding: 0.5rem 1.5rem;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    #searchResults {
-      margin-top: 1rem;
-      text-align: center;
-      color: #374151;
-    }
-
-    /* About Section */
-    .about-section {
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      padding: 5rem 2rem;
-      color: white;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    .about-card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-    }
-
-    .about-card h2 {
-      font-size: 1.875rem;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 2rem;
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-
-    .about-text {
-      color: #374151;
-    }
-
-    .about-text p {
-      margin-bottom: 1rem;
-    }
-
-    .about-image {
-      background: linear-gradient(135deg, #ddd6fe, #c7d2fe);
-      height: 16rem;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    .about-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Services Section */
-    .services-section {
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      padding: 5rem 2rem;
-      color: white;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    .services-section h2 {
-      font-size: 1.875rem;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
-    .service-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s;
-    }
-
-    .service-card:hover {
-      transform: scale(1.05);
-    }
-
-    .service-card .icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .service-card h3 {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #9333ea;
-      margin-bottom: 0.5rem;
-    }
-
-    .service-card p {
-      color: #4b5563;
-    }
-
-    /* Contact Section */
-    .contact-section {
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      padding: 5rem 2rem;
-      color: white;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    .contact-card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-    }
-
-    .contact-card h2 {
-      font-size: 1.875rem;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 3rem;
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .contact-form {
-      max-width: 672px;
-      margin: 0 auto;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      color: #374151;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      border: 2px solid #e5e7eb;
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      color: #111827;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: #9333ea;
-    }
-
-    .form-group textarea {
-      height: 8rem;
-      resize: vertical;
-    }
-
-    .contact-form button {
-      width: 100%;
-      background: linear-gradient(to right, #9333ea, #4f46e5);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s;
-    }
-
-    .contact-form button:hover {
-      background: linear-gradient(to right, #7e22ce, #4338ca);
-      transform: scale(1.05);
-    }
-
-    .message-display {
-      margin-top: 2rem;
-    }
-
-    .message-display h3 {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #9333ea;
-      margin-bottom: 1rem;
-    }
-
-    .message-item {
-      background: #f9fafb;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .message-item .name {
-      font-weight: 600;
-      color: #1f2937;
-    }
-
-    .message-item .email {
-      font-size: 0.875rem;
-      color: #4b5563;
-    }
-
-    .message-item .text {
-      color: #374151;
-      margin-top: 0.5rem;
-    }
-
-    /* Footer */
-    footer {
-      background: linear-gradient(to right, #581c87, #312e81);
-      color: white;
-      padding: 2rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    footer p {
-      margin: 0.5rem 0;
-    }
-
-    .footer-subtitle {
-      color: #ddd6fe;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .nav-links {
-        gap: 1rem;
-      }
-
-      .hero h2 {
-        font-size: 2rem;
-      }
-
-      .services-grid,
-      .about-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
   
@@ -419,7 +17,7 @@
         <a href="#about">About</a>
         <a href="#services">Services</a>
         <a href="#contact">Contact</a>
-        <a href="./login.html">Login</a>
+        <a href="./logout.html">Logout</a>
       </div>
     </div>
   </nav>
@@ -635,5 +233,219 @@
       });
     });
   </script>
+
+  <!-- Chatbot Popup Button -->
+  <button id="chatbotToggle" class="chatbot-toggle">
+    <span class="chat-icon">💬</span>
+    <span class="close-icon" style="display: none;">✕</span>
+  </button>
+
+  <!-- Chatbot Popup Container -->
+  <div id="chatbotPopup" class="chatbot-popup">
+    <div class="chatbot-header">
+      <div class="chatbot-header-content">
+        <span class="chatbot-avatar">🤖</span>
+        <div class="chatbot-title">
+          <h3>AI Assistant</h3>
+          <p class="chatbot-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Connecting...</span>
+          </p>
+        </div>
+      </div>
+      <button class="chatbot-minimize" id="minimizeBtn">−</button>
+    </div>
+
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="welcome-msg">
+        <p>👋 Hello! I'm your AI assistant powered by Qwen 2.5.</p>
+        <p>How can I help you today?</p>
+      </div>
+    </div>
+
+    <div class="chatbot-typing" id="chatbotTyping">
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+    </div>
+
+    <div class="chatbot-input-container">
+      <input 
+        type="text" 
+        id="chatbotInput" 
+        placeholder="Type your message..."
+        autocomplete="off"
+      >
+      <button id="chatbotSend">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 8L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Chatbot Popup Functionality
+    const chatbotToggle = document.getElementById('chatbotToggle');
+    const chatbotPopup = document.getElementById('chatbotPopup');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInput = document.getElementById('chatbotInput');
+    const chatbotSend = document.getElementById('chatbotSend');
+    const chatbotTyping = document.getElementById('chatbotTyping');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+
+    const OLLAMA_API_URL = 'http://localhost:11434/api/generate';
+    const MODEL_NAME = 'qwen2.5:1.5b';
+
+    let isOpen = false;
+
+    // Toggle chatbot
+    chatbotToggle.addEventListener('click', () => {
+      isOpen = !isOpen;
+      chatbotPopup.classList.toggle('active');
+      
+      // Toggle icons
+      const chatIcon = chatbotToggle.querySelector('.chat-icon');
+      const closeIcon = chatbotToggle.querySelector('.close-icon');
+      
+      if (isOpen) {
+        chatIcon.style.display = 'none';
+        closeIcon.style.display = 'block';
+        chatbotInput.focus();
+      } else {
+        chatIcon.style.display = 'block';
+        closeIcon.style.display = 'none';
+      }
+    });
+
+    // Minimize button
+    minimizeBtn.addEventListener('click', () => {
+      isOpen = false;
+      chatbotPopup.classList.remove('active');
+      document.querySelector('.chat-icon').style.display = 'block';
+      document.querySelector('.close-icon').style.display = 'none';
+    });
+
+    // Add message to chat
+    function addChatMessage(message, isUser) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+      
+      messageDiv.innerHTML = `
+        <div class="message-avatar">${isUser ? '👤' : '🤖'}</div>
+        <div class="message-bubble">${message}</div>
+      `;
+      
+      chatbotMessages.appendChild(messageDiv);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    // Show typing indicator
+    function showChatTyping() {
+      chatbotTyping.classList.add('active');
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    // Hide typing indicator
+    function hideChatTyping() {
+      chatbotTyping.classList.remove('active');
+    }
+
+    // Show error
+    function showChatError(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-msg';
+      errorDiv.textContent = message;
+      chatbotMessages.appendChild(errorDiv);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    // Update status
+    function updateChatStatus(connected) {
+      if (connected) {
+        statusDot.classList.remove('disconnected');
+        statusText.textContent = 'Online';
+      } else {
+        statusDot.classList.add('disconnected');
+        statusText.textContent = 'Offline';
+      }
+    }
+
+    // Send message
+    async function sendChatMessage() {
+      const message = chatbotInput.value.trim();
+      if (!message) return;
+
+      addChatMessage(message, true);
+      chatbotInput.value = '';
+      chatbotSend.disabled = true;
+      showChatTyping();
+
+      try {
+        const response = await fetch(OLLAMA_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: MODEL_NAME,
+            prompt: message,
+            stream: false
+          })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const data = await response.json();
+        hideChatTyping();
+
+        if (data.response) {
+          addChatMessage(data.response, false);
+          updateChatStatus(true);
+        } else {
+          addChatMessage("Sorry, I didn't understand that. Try again!", false);
+        }
+
+      } catch (error) {
+        console.error('Chat error:', error);
+        hideChatTyping();
+        
+        if (error.message.includes('Failed to fetch')) {
+          showChatError('Cannot connect to AI. Check if Ollama is running.');
+          updateChatStatus(false);
+        } else {
+          showChatError('Error: ' + error.message);
+          updateChatStatus(false);
+        }
+      }
+
+      chatbotSend.disabled = false;
+      chatbotInput.focus();
+    }
+
+    // Event listeners
+    chatbotSend.addEventListener('click', sendChatMessage);
+    chatbotInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendChatMessage();
+      }
+    });
+
+    // Test connection on load
+    async function testChatConnection() {
+      try {
+        const response = await fetch('http://localhost:11434/api/tags');
+        if (response.ok) {
+          updateChatStatus(true);
+        }
+      } catch (error) {
+        updateChatStatus(false);
+      }
+    }
+
+    testChatConnection();
+  </script>
+
 </body>
 </html>
