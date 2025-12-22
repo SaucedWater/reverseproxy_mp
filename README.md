@@ -30,7 +30,7 @@ If `npx tailwindcss init` doesn't work..
 ## What is going on?
 This may seem overwhelming at first, but let us break down everything.
 
-`Context:` This is ebsite is for a Web Serevr [A or B] for the project Mastering Reverse Proxy for Web Server Protection. The GOAL of this project is to:
+`Context:` This is website is for a Web Server [A or B] for the project Mastering Reverse Proxy for Web Server Protection. The GOAL of this project is to:
 1. Have a working Reverse Proxy.
 2. Working SOC Dashboard.
 3. Secure and working and running website for both webb servers
