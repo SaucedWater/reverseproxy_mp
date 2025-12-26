@@ -45,9 +45,11 @@ The following technologies are utilized in this deployment:
 
 ## 🛠️ Installation & Branches
 
-To view the specific configuration for each web server, please navigate to the respective branches:
+To view the specific configuration for each component, please navigate to the respective branches:
 
-| Server | Branch Name | Direct Link |
+| Server / Service | Branch Name | Direct Link |
 | :--- | :--- | :--- |
 | **Web Server A** | `webservera` | [Go to Branch ->](../../tree/webservera) |
 | **Web Server B** | `webserverb` | [Go to Branch ->](../../tree/webserverb) |
+| **DNS Server** | `dns` | [Go to Branch ->](../../tree/dns) |
+| **DHCP Server** | `dhcp` | [Go to Branch ->](../../tree/dhcp) |
