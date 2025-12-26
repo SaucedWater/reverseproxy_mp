@@ -49,6 +49,7 @@ To view the specific configuration for each component, please navigate to the re
 
 | Server / Service | Branch Name | Direct Link |
 | :--- | :--- | :--- |
+| **Reverse Proxy** | `reverseproxy` | [Go to Branch ->](../../tree/reverseproxy) |
 | **Web Server A** | `webservera` | [Go to Branch ->](../../tree/webservera) |
 | **Web Server B** | `webserverb` | [Go to Branch ->](../../tree/webserverb) |
 | **DNS Server** | `dns` | [Go to Branch ->](../../tree/dns) |
