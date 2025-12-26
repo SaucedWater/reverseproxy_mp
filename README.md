@@ -25,6 +25,7 @@ Quickly navigate between the different components of the project:
 | Component | Branch Name | Link |
 | :--- | :--- | :--- |
 | **🏠 Main Project** | `main` | [Return to Main ->](../../tree/main) |
+| **🔄 Reverse Proxy** | `reverseproxy` | [Go to Branch ->](../../tree/reverseproxy) |
 | **🌐 DNS Config** | `dns` | [Go to Branch ->](../../tree/dns) |
 | **🖥️ Web Server A** | `webservera` | [Go to Branch ->](../../tree/webservera) |
 | **🖥️ Web Server B** | `webserverb` | [Go to Branch ->](../../tree/webserverb) |
