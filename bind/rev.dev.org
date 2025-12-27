@@ -5,7 +5,7 @@
 ;
 $TTL	86400
 @	IN	SOA	dev.org. root.dev.org. (
-			      1		; Serial
+			      2		; Serial
 			 604800		; Refresh
 			  86400		; Retry
 			2419200		; Expire
@@ -15,3 +15,6 @@ $TTL	86400
 
 10	IN	PTR	proxyserver.dev.org.
 10	IN	PTR	www.dev.org.
+
+; soc below
+40	IN	PTR 	soc.dev.org.
