@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Log Out</title>
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    main {
+      width: 100%;
+      max-width: 448px;
+    }
+
+    /* Logout Card */
+    .logout-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    /* Icon Section */
+    .icon-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .icon-circle {
+      width: 6rem;
+      height: 6rem;
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-circle svg {
+      width: 3.5rem;
+      height: 3.5rem;
+      color: white;
+    }
+
+    .divider {
+      width: 4rem;
+      height: 0.25rem;
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      border-radius: 9999px;
+      margin: 0 auto;
+    }
+
+    /* Message Section */
+    h1 {
+      font-size: 1.875rem;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Action Button */
+    .signin-btn {
+      display: inline-block;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(to right, #9333ea, #4f46e5);
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+      font-size: 1rem;
+    }
+
+    .signin-btn:hover {
+      background: linear-gradient(to right, #7e22ce, #4338ca);
+      transform: scale(1.05);
+    }
+
+    /* Extra text section */
+    .extra-info {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .extra-info p {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 1rem;
+    }
+
+    .extra-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: white;
+      font-size: 0.875rem;
+    }
+
+    /* SVG Icons */
+    svg {
+      fill: none;
+      stroke: currentColor;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .logout-card {
+        padding: 1.5rem;
+      }
+
+      .icon-circle {
+        width: 5rem;
+        height: 5rem;
+      }
+
+      .icon-circle svg {
+        width: 3rem;
+        height: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="logout-card">
+      
+      <!-- Icon Section -->
+      <div class="icon-section">
+        <div class="icon-circle">
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+        </div>
+        <div class="divider"></div>
+      </div>
+
+      <!-- Message Section -->
+      <h1>You're Logged Out</h1>
+
+      <!-- Action Button -->
+      <a href="login.html" class="signin-btn">
+        Sign in again
+      </a>
+
+      <!-- Extra text -->
+      <div class="extra-info">
+        <p>Your session has ended.</p>
+        <div class="extra-links">
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>© MP Project</p>
+    </div>
+  </main>
+</body>
