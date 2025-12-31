@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
+    color: #1f2937;
+    display: flex;
+    justify-content: center;
+    padding-top: 3rem;
+}
+
+/* Container Card */
+.dashboard-container {
+    background-color: white;
+    max-width: 42rem; /* Equivalent to max-w-2xl */
+    width: 100%;
+    margin: 0 1rem;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography */
+h1 {
+    font-size: 1.5rem; /* Equivalent to text-2xl */
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+p {
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+/* Logout Button Styling */
+.btn-logout {
+    display: inline-block;
+    background-color: #ef4444; /* Equivalent to bg-red-500 */
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+    background-color: #dc2626; /* Darker red on hover */
+}
