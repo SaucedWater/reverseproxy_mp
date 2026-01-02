@@ -29,3 +29,4 @@ Quickly navigate between the different components of the project:
 | **🌐 DNS Config** | `dns` | [Go to Branch ->](../../tree/dns) |
 | **🖥️ Web Server A** | `webservera` | [Go to Branch ->](../../tree/webservera) |
 | **🖥️ Web Server B** | `webserverb` | [Go to Branch ->](../../tree/webserverb) |
+| **Wazuh Rules** | `wazuhrules` | [Go to Branch ->](../../tree/wazuhrules) |
