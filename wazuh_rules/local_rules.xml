@@ -1,13 +1,29 @@
-<!-- Local rules -->
+<!--
+  ============================================================
+  Local Custom Wazuh Rules (Major Project – Reverse Proxy SOC)
+  Author: TPY
+  Purpose:
+  - Detect authentication attacks
+  - Detect and classify WAF (ModSecurity) blocks
+  - Correlate web attacks (SQLi, XSS, Path Traversal)
+  - Identify potential DoS / brute-force behavior
+  ============================================================
+-->
 
-<!-- Modify it at your will. -->
-<!-- Copyright (C) 2015, Wazuh Inc. -->
-
-<!-- Example -->
 <group name="local,syslog,sshd,">
 
   <!--
-  Dec 10 01:02:02 host sshd[1234]: Failed none for root from 1.1.1.1 port 1066 ssh2
+    RULE ID: 100001
+    PURPOSE:
+    - Detect failed SSH authentication attempts from a known source IP
+    - Used to demonstrate host-based intrusion detection
+
+    HOW IT WORKS:
+    - Triggers when base SSHD auth failure rule (SID 5716) fires
+    - Matches a specific source IP (example: 1.1.1.1)
+
+    DEMO VALUE:
+    - Shows Wazuh detecting brute-force or unauthorized SSH access
   -->
   <rule id="100001" level="5">
     <if_sid>5716</if_sid>
@@ -16,4 +32,130 @@
     <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
   </rule>
 
+  <!--
+    RULE ID: 100100
+    PURPOSE:
+    - Base detection rule for ModSecurity (WAF) blocking a request
+
+    HOW IT WORKS:
+    - Triggers when Wazuh detects ModSecurity "Access denied" messages
+    - Acts as a PARENT rule for more specific web attack rules
+
+    DEMO VALUE:
+    - Shows reverse proxy actively blocking malicious web traffic
+    - Serves as the foundation for attack classification (SQLi, XSS, etc.)
+  -->
+  <rule id="100100" level="10">
+    <if_sid>31101</if_sid>
+    <match>ModSecurity: Access denied</match>
+    <description>WAF: ModSecurity Blocked a Request</description>
+    <group>web,access_denied,modsecurity,nginx,</group>
+  </rule>
+
+  <!--
+    RULE ID: 100101
+    PURPOSE:
+    - Detect SQL Injection attempts blocked by the WAF
+
+    HOW IT WORKS:
+    - Fires ONLY after rule 100100 (ModSecurity block)
+    - Matches common SQL injection patterns in request payloads
+
+    MITRE ATT&CK:
+    - T1190: Exploit Public-Facing Application
+
+    DEMO VALUE:
+    - Demonstrates protection against database attacks
+    - Maps web attack detection to MITRE framework
+  -->
+  <rule id="100101" level="12">
+    <if_sid>100100</if_sid>
+    <match>SQL Injection|union select|select * from</match>
+    <description>WAF: SQL Injection Attack Detected</description>
+    <mitre>
+      <id>T1190</id> 
+    </mitre>
+    <group>web,attack,sql_injection,pci_dss_11.4,</group>
+  </rule>
+
+  <!--
+    RULE ID: 100102
+    PURPOSE:
+    - Detect Cross-Site Scripting (XSS) attempts blocked by the WAF
+
+    HOW IT WORKS:
+    - Child rule of ModSecurity block (100100)
+    - Matches common XSS payload indicators
+
+    MITRE ATT&CK:
+    - T1059.007: Command and Scripting Interpreter – JavaScript
+
+    DEMO VALUE:
+    - Shows client-side attack prevention
+    - Highlights protection of users from malicious scripts
+  -->
+  <rule id="100102" level="12">
+    <if_sid>100100</if_sid>
+    <match>Cross-site Scripting|XSS|script&gt;</match>
+    <description>WAF: XSS Attack Detected</description>
+    <mitre>
+      <id>T1059.007</id>
+    </mitre>
+    <group>web,attack,xss,pci_dss_6.5.7,</group>
+  </rule>
+
+  <!--
+    RULE ID: 100103
+    PURPOSE:
+    - Detect directory / path traversal attacks blocked by the WAF
+
+    HOW IT WORKS:
+    - Child rule of ModSecurity block (100100)
+    - Matches attempts to access sensitive system files
+
+    MITRE ATT&CK:
+    - T1083: File and Directory Discovery
+
+    DEMO VALUE:
+    - Shows reverse proxy preventing unauthorized file access
+    - Reinforces backend server isolation
+  -->
+  <rule id="100103" level="12">
+    <if_sid>100100</if_sid>
+    <match>Directory Traversal|Path Traversal|/etc/passwd|/boot.ini</match>
+    <description>WAF: Path Traversal Attack Detected</description>
+    <mitre>
+      <id>T1083</id>
+    </mitre>
+    <group>web,attack,pci_dss_6.5.8,</group>
+  </rule>
+
+  <!--
+    RULE ID: 100105
+    PURPOSE:
+    - Detect repeated malicious requests from the same IP
+    - Identify potential DoS or brute-force attempts
+
+    HOW IT WORKS:
+    - Triggers when rule 100100 fires 20 times within 10 seconds
+    - Requires all events to come from the SAME source IP
+
+    MITRE ATT&CK:
+    - T1498: Network Denial of Service
+
+    DEMO VALUE:
+    - Shows Wazuh correlation and behavioral detection
+    - Demonstrates layered defense: WAF + SIEM analytics
+  -->
+  <rule id="100105" level="14" frequency="20" timeframe="10">
+    <if_matched_sid>100100</if_matched_sid>
+    <same_source_ip />
+    <description>WAF: Multiple Blocks from Same IP (Potential DoS/Brute Force)</description>
+    <mitre>
+      <id>T1498</id> 
+    </mitre>
+    <group>web,dos,attack,</group>
+  </rule>
+
 </group>
+
