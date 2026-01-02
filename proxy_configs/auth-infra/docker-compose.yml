@@ -6,11 +6,12 @@ services:
     container_name: keycloak
     command: start-dev --http-relative-path /auth
     environment:
+      KC_HOSTNAME_STRICT: "false"
       KC_DB: dev-file
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_PROXY: edge
-      KC_HOSTNAME_URL: https://auth.dev.org/auth
+        #KC_HOSTNAME_URL: https://auth.dev.org/auth
     ports:
       - "8080:8080"
     volumes:
@@ -35,7 +36,7 @@ services:
     environment:
       OAUTH2_PROXY_PROVIDER: "keycloak-oidc"
       OAUTH2_PROXY_CLIENT_ID: "proxy-server"
-      OAUTH2_PROXY_CLIENT_SECRET: "<INSERT CLIENT SECRET HERE>"
+      OAUTH2_PROXY_CLIENT_SECRET: "pZK2TL7ZiKMFPPzdiNlTfDEIyWtDUgfr"
       OAUTH2_PROXY_OIDC_ISSUER_URL: "https://auth.dev.org/auth/realms/dev-org"
 
       OAUTH2_PROXY_REDIRECT_URL: "https://www.dev.org/oauth2/callback"
@@ -44,8 +45,9 @@ services:
       OAUTH2_PROXY_VALIDATE_URL: "http://keycloak:8080/auth/realms/dev-org/protocol/openid-connect/userinfo"
 
       OAUTH2_PROXY_COOKIE_SECURE: "false" 
-      OAUTH2_PROXY_COOKIE_SAMESITE: "lax"
+      OAUTH2_PROXY_COOKIE_SAMESITE: "lax"  
       OAUTH2_PROXY_COOKIE_DOMAIN: ".dev.org"
+      OAUTH2_PROXY_COOKIE_REFRESH: "1h"
       OAUTH2_PROXY_COOKIE_EXPIRE: "24h"
       OAUTH2_PROXY_COOKIE_SECRET: "AbCdEfGhIjKlMnOpQrStUvWxYz123456"
 
