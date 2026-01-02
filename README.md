@@ -31,3 +31,4 @@ Quickly navigate between the different components of the project:
 | **📡 DHCP Config** | `dhcp` | [Go to Branch ->](../../tree/dhcp) |
 | **🖥️ Web Server A** | `webservera` | [Go to Branch ->](../../tree/webservera) |
 | **🖥️ Web Server B** | `webserverb` | [Go to Branch ->](../../tree/webserverb) |
+| **Wazuh Rules** | `wazuhrules` | [Go to Branch ->](../../tree/wazuhrules) |
