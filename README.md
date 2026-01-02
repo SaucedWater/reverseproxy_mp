@@ -54,3 +54,4 @@ To view the specific configuration for each component, please navigate to the re
 | **Web Server B** | `webserverb` | [Go to Branch ->](../../tree/webserverb) |
 | **DNS Server** | `dns` | [Go to Branch ->](../../tree/dns) |
 | **DHCP Server** | `dhcp` | [Go to Branch ->](../../tree/dhcp) |
+| **Wazuh Rules** | `wazuhrules` | [Go to Branch ->](../../tree/wazuhrules) |
