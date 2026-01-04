@@ -59,14 +59,14 @@ last upd: 4 jan 2026
        Keep multiple indicators for resilience.
        ========================================================= -->
   <rule id="100102" level="12">
-    <if_sid>100100</if_sid>
-    <match>tag "attack-xss"|Cross-site Scripting|XSS</match>
-    <description>WAF: XSS Detected (OWASP CRS)</description>
-    <mitre>
-      <id>T1059.007</id>
-    </mitre>
-    <group>web,attack,xss,modsecurity,pci_dss_6.5.7,</group>
-  </rule>
+  <match>tag "attack-xss"|Cross-site Scripting|XSS Attack</match>
+  <description>WAF: XSS Detected (OWASP CRS)</description>
+  <mitre>
+    <id>T1059.007</id>
+  </mitre>
+  <group>web,attack,xss,modsecurity,</group>
+</rule>
+
 
   <!-- =========================================================
        5) PATH TRAVERSAL / FILE ACCESS ATTEMPTS (CHILD)
@@ -98,4 +98,5 @@ last upd: 4 jan 2026
   </rule>
 
 </group>
+
 
