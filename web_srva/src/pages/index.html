@@ -310,7 +310,7 @@
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
 
-    const OLLAMA_API_URL = 'http://localhost:11434/api/generate';
+    const OLLAMA_API_URL = '/ollama/api/generate';
     const MODEL_NAME = 'qwen2.5:1.5b';
 
     let isOpen = false;
@@ -449,7 +449,7 @@
     // Test connection on load
     async function testChatConnection() {
       try {
-        const response = await fetch('http://localhost:11434/api/tags');
+        const response = await fetch('/ollama/api/tags');
         if (response.ok) {
           updateChatStatus(true);
         }
