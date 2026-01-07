@@ -612,6 +612,7 @@
 
         const response = await fetch(OLLAMA_API_URL, {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
@@ -657,7 +658,7 @@
     // Test connection on load
     async function testChatConnection() {
       try {
-        const response = await fetch('/ollama/api/tags');
+        const response = await fetch('/ollama/api/tags', {credentials: 'include'});
         if (response.ok) {
           updateChatStatus(true);
         }
