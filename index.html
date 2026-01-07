@@ -5,106 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Web Server A</title>
   <link rel="stylesheet" href="css/index.css">
-  <!-- to be placed into index.css later (.\reverseproxy_mp\web_srva\src\css\index.css) -->
-  <style> 
-    /* Inline styles for the new Chatbot File Upload features 
-      (To ensure it works without modifying external CSS)
-    */
-    .chatbot-input-wrapper {
-      display: flex;
-      flex-direction: column;
-      border-top: 1px solid #eee;
-    }
-
-    .file-preview-area {
-      display: none; /* Hidden by default */
-      padding: 8px 12px;
-      background-color: #f8f9fa;
-      border-bottom: 1px solid #eee;
-      font-size: 0.85rem;
-      color: #333;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .file-preview-area.active {
-      display: flex;
-    }
-
-    .file-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .remove-file-btn {
-      background: none;
-      border: none;
-      color: #ff4444;
-      cursor: pointer;
-      font-size: 1.1rem;
-      padding: 0 4px;
-    }
-
-    .remove-file-btn:hover {
-      color: #cc0000;
-    }
-
-    /* Adjust existing input container to accommodate the clip icon */
-    .chatbot-input-container {
-      display: flex;
-      padding: 10px;
-      gap: 8px;
-      align-items: center;
-      background: white;
-    }
-
-    .chat-attach-label {
-      cursor: pointer;
-      color: #666;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px;
-      transition: color 0.2s;
-    }
-
-    .chat-attach-label:hover {
-      color: #007bff;
-    }
-
-    .chat-attach-label svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    #chatbotInput {
-      flex: 1;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      padding: 8px 12px;
-      outline: none;
-    }
-  </style>
 </head>
 <body>
-
-  <script> // to be placed into index.js later (.\reverseproxy_mp\web_srva\src\js\index.js)
-    fetch('/oauth2/userinfo')
-      .then(response => {
-        if (response.ok) {
-          document.getElementById('loginBtn').style.display = 'none';
-          document.getElementById('logoutBtn').style.display = 'block';
-        } else {
-          document.getElementById('loginBtn').style.display = 'block';
-          document.getElementById('logoutBtn').style.display = 'none';
-        }
-      });
+  <script>
+ 	fetch('/oauth2/userinfo') // OAuth2 Proxy endpoint
+		.then(response => {
+			if (response.ok) {
+				document.getElementById('loginBtn').style.display = 'none';
+				document.getElementById('logoutBtn').style.display = 'block';
+			} else {
+				document.getElementById('loginBtn').style.display = 'block';
+				document.getElementById('logoutBtn').style.display = 'none';
+			}
+		});
   </script>
-  
   
   <!-- Navigation Bar -->
   <nav>
@@ -116,6 +30,7 @@
         <a href="#services">Services</a>
         <a href="#contact">Contact</a>
         <a href="/oauth2/sign_out?rd=https%3A%2F%2Fauth.dev.org%2Fauth%2Frealms%2Fdev-org%2Fprotocol%2Fopenid-connect%2Flogout%3Fclient_id%3Dproxy-server%26post_logout_redirect_uri%3Dhttps%3A%2F%2Fwww.dev.org%2Flogout.html" id="logoutBtn">Logout</a>
+        <a href="./login.html" id="loginBtn">Login</a>
       </div>
     </div>
   </nav>
@@ -124,7 +39,7 @@
   <section id="home" class="hero">
     <div class="hero-container">
       <h2>Welcome to WebServer A</h2>
-      <p>Hello World! Welcome to Web Server A!</p>
+      <p>Hello World! Web Server A</p>
       <button>Get Started</button>
     </div>
   </section>
@@ -145,7 +60,7 @@
     </div>
   </section>
 
-  <script> // to be placed into index.js later (.\reverseproxy_mp\web_srva\src\js\index.js)
+  <script>
     // VULNERABILITY: Directly inserting user input without sanitization
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search');
@@ -171,12 +86,8 @@
               Im just trying random things for now for the website
             </p>
           </div>
-          <div class="about-image">
-            <img 
-              src="https://tfipost.com/wp-content/uploads/2022/04/Shinchan_in_hindi_dubbed_show.jpg" 
-              alt="random image"
-            >
-          </div>
+	  <div class="about-image">
+	  </div>
         </div>
       </div>
     </div>
@@ -256,7 +167,7 @@
     </div>
 
     <!-- Stored XSS Demo Script -->
-    <script> // to be placed into index.js later (.\reverseproxy_mp\web_srva\src\js\index.js)
+    <script>
       // Fake database (stored XSS demonstration)
       let messages = [];
 
@@ -367,46 +278,22 @@
       <span class="typing-dot"></span>
     </div>
 
-    <!-- Wrapper for Input and File Preview -->
-    <div class="chatbot-input-wrapper">
-      
-      <!-- File Preview Area -->
-      <div id="filePreview" class="file-preview-area">
-        <div class="file-info">
-          <span>📎</span>
-          <span id="fileName">document.txt</span>
-        </div>
-        <button id="removeFileBtn" class="remove-file-btn" title="Remove file">×</button>
-      </div>
-
-      <!-- Input Area -->
-      <div class="chatbot-input-container">
-        <!-- File Input (Hidden) -->
-        <input type="file" id="chatFileInput" style="display: none;">
-        
-        <!-- Paperclip Button -->
-        <label for="chatFileInput" class="chat-attach-label" title="Attach file">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-          </svg>
-        </label>
-
-        <input 
-          type="text" 
-          id="chatbotInput" 
-          placeholder="Type your message..."
-          autocomplete="off"
-        >
-        <button id="chatbotSend">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 8L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
+    <div class="chatbot-input-container">
+      <input 
+        type="text" 
+        id="chatbotInput" 
+        placeholder="Type your message..."
+        autocomplete="off"
+      >
+      <button id="chatbotSend">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 8L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
   </div>
 
-  <script> // JavaScript for Chatbot Functionality - to be placed into index.js later (.\reverseproxy_mp\web_srva\src\js\index.js)
+  <script>
     // Chatbot Popup Functionality
     const chatbotToggle = document.getElementById('chatbotToggle');
     const chatbotPopup = document.getElementById('chatbotPopup');
@@ -417,18 +304,11 @@
     const chatbotTyping = document.getElementById('chatbotTyping');
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
-    
-    // File Upload Elements
-    const chatFileInput = document.getElementById('chatFileInput');
-    const filePreview = document.getElementById('filePreview');
-    const fileNameSpan = document.getElementById('fileName');
-    const removeFileBtn = document.getElementById('removeFileBtn');
 
     const OLLAMA_API_URL = '/ollama/api/generate';
     const MODEL_NAME = 'qwen2.5:1.5b';
 
     let isOpen = false;
-    let currentFile = null; // Store the selected file data
 
     // Toggle chatbot
     chatbotToggle.addEventListener('click', () => {
@@ -457,70 +337,14 @@
       document.querySelector('.close-icon').style.display = 'none';
     });
 
-    // --- File Handling Logic ---
-
-    chatFileInput.addEventListener('change', function(e) {
-      if (this.files && this.files[0]) {
-        const file = this.files[0];
-        currentFile = file;
-        
-        // Show preview
-        fileNameSpan.textContent = file.name;
-        filePreview.classList.add('active');
-        chatbotInput.focus();
-      }
-    });
-
-    removeFileBtn.addEventListener('click', clearFileSelection);
-
-    function clearFileSelection() {
-      currentFile = null;
-      chatFileInput.value = ''; // Reset input
-      filePreview.classList.remove('active');
-    }
-
-    // Helper to read file as Base64 (for images)
-    function readFileAsBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          // Remove "data:*/*;base64," prefix for Ollama
-          const base64String = reader.result.split(',')[1];
-          resolve(base64String);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Helper to read file as Text (for code/docs)
-    function readFileAsText(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsText(file);
-      });
-    }
-
-    // --- End File Handling Logic ---
-
     // Add message to chat
-    function addChatMessage(message, isUser, attachmentName = null) {
+    function addChatMessage(message, isUser) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
       
-      let attachmentHtml = '';
-      if (attachmentName) {
-        attachmentHtml = `<div class="msg-attachment">📎 ${attachmentName}</div>`;
-      }
-
       messageDiv.innerHTML = `
         <div class="message-avatar">${isUser ? '👤' : '🤖'}</div>
-        <div class="message-bubble">
-            ${attachmentHtml}
-            ${message}
-        </div>
+        <div class="message-bubble">${message}</div>
       `;
       
       chatbotMessages.appendChild(messageDiv);
@@ -561,59 +385,22 @@
     // Send message
     async function sendChatMessage() {
       const message = chatbotInput.value.trim();
-      // Allow sending if there's a file, even if message is empty
-      if (!message && !currentFile) return;
+      if (!message) return;
 
-      const fileName = currentFile ? currentFile.name : null;
-      addChatMessage(message || (currentFile ? "Sent a file." : ""), true, fileName);
-      
+      addChatMessage(message, true);
       chatbotInput.value = '';
       chatbotSend.disabled = true;
       showChatTyping();
 
       try {
-        let promptToSend = message;
-        let imagesToSend = [];
-
-        // Process File if exists
-        if (currentFile) {
-          if (currentFile.type.startsWith('image/')) {
-            // It's an image
-            try {
-              const base64 = await readFileAsBase64(currentFile);
-              imagesToSend.push(base64);
-            } catch (err) {
-              console.error("Error reading image:", err);
-            }
-          } else {
-            // Assume text/code
-            try {
-              const textContent = await readFileAsText(currentFile);
-              promptToSend = `[User uploaded file: ${currentFile.name}]\n\n${textContent}\n\n[User Message]: ${message}`;
-            } catch (err) {
-              console.error("Error reading text file:", err);
-              promptToSend += `\n(Error reading attached file: ${currentFile.name})`;
-            }
-          }
-          // Clear file after processing
-          clearFileSelection();
-        }
-
-        const payload = {
-          model: MODEL_NAME,
-          prompt: promptToSend,
-          stream: false
-        };
-
-        // Add images to payload if any (Ollama support)
-        if (imagesToSend.length > 0) {
-          payload.images = imagesToSend;
-        }
-
         const response = await fetch(OLLAMA_API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            model: MODEL_NAME,
+            prompt: message,
+            stream: false
+          })
         });
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
