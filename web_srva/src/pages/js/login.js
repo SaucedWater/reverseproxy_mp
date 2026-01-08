@@ -11,8 +11,16 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   msgElement.className = 'query-display';
   
   try {
-    // Call vulnerable API endpoint
-    const response = await fetch('/api/login-vulnerable', {
+    // Check for SQL injection in username input
+    if (username.includes("'") || username.includes("--") || 
+        username.toLowerCase().includes(" or ") || username.toLowerCase().includes("union")) {
+      msgElement.innerHTML = '<br><br><span class="sql-injection-warning">⚠️ SQL INJECTION DETECTED!</span>';
+      msgElement.innerHTML += '<br><span style="color: #ef4444; font-weight: bold;">✗ Invalid username or password</span>';
+      return; // Prevent further processing if SQL injection is detected
+    }
+
+    // Call the API endpoint for SQL login check (replace the URL with your backend login route)
+    const response = await fetch('/api/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -22,31 +30,25 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     
     const data = await response.json();
     
-    // Display the SQL query
+    // Display the SQL query (if needed)
     msgElement.innerHTML = `<strong>SQL Query Executed:</strong><br>
       <code style="color: #3b82f6;">${data.query || 'N/A'}</code>`;
     
     if (data.success) {
-      // Check for SQL injection
-      if (username.includes("'") || username.includes("--") || 
-          username.toLowerCase().includes(" or ") || username.toLowerCase().includes("union")) {
-        msgElement.innerHTML += '<br><br><span class="sql-injection-warning">⚠️ SQL INJECTION DETECTED!</span>';
-        msgElement.innerHTML += '<br><span style="color: #10b981; font-weight: bold;">✓ Authentication bypassed!</span>';
-        msgElement.innerHTML += '<br><span style="color: #10b981;">✓ Logged in as: ' + data.user.username + '</span>';
-      } else {
-        msgElement.innerHTML += '<br><br><span style="color: #10b981; font-weight: bold;">✓ Login successful!</span>';
-        msgElement.innerHTML += '<br>Welcome, ' + data.user.username + '!';
-      }
-      
-      // Redirect to index after 2 seconds
+      // Login successful
+      msgElement.innerHTML += '<br><br><span style="color: #10b981; font-weight: bold;">✓ Login successful!</span>';
+      msgElement.innerHTML += '<br>Welcome, ' + data.user.username + '!';
+
+      // Redirect to homepage after 2 seconds
       setTimeout(() => {
         window.location.href = 'index.html';
       }, 2000);
     } else {
+      // Login failed
       msgElement.innerHTML += '<br><br><span style="color: #ef4444; font-weight: bold;">✗ Login failed</span>';
       msgElement.innerHTML += '<br>' + data.message;
     }
-    
+
   } catch (error) {
     console.error('Login error:', error);
     msgElement.innerHTML = '<span style="color: #ef4444;">Error connecting to server: ' + error.message + '</span>';
