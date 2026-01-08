@@ -2,13 +2,22 @@
 fetch('/oauth2/userinfo')
   .then(response => {
     if (response.ok) {
+      // If user is logged in, hide the Login button and show the Logout button
       document.getElementById('loginBtn').style.display = 'none';
       document.getElementById('logoutBtn').style.display = 'block';
     } else {
+      // If user is not logged in, show the Login button and hide the Logout button
       document.getElementById('loginBtn').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'none';
     }
+  })
+  .catch(error => {
+    // Handle errors if needed (e.g., API failure or other issues)
+    console.error('Authentication check error:', error);
+    document.getElementById('loginBtn').style.display = 'block';
+    document.getElementById('logoutBtn').style.display = 'none';
   });
+
 
 /* --- XSS Reflected Logic --- */
 // VULNERABILITY: Directly inserting user input without sanitization
