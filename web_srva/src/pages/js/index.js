@@ -1,12 +1,16 @@
 /* --- Auth Check Logic --- */
+let isUserLoggedIn = false;
+
 fetch('/oauth2/userinfo')
   .then(response => {
     if (response.ok) {
       // If user is logged in, hide the Login button and show the Logout button
+      isUserLoggedIn = true;
       document.getElementById('loginBtn').style.display = 'none';
       document.getElementById('logoutBtn').style.display = 'block';
     } else {
       // If user is not logged in, show the Login button and hide the Logout button
+      isUserLoggedIn = false;
       document.getElementById('loginBtn').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'none';
     }
@@ -14,8 +18,20 @@ fetch('/oauth2/userinfo')
   .catch(error => {
     // Handle errors if needed (e.g., API failure or other issues)
     console.error('Authentication check error:', error);
+    isUserLoggedIn = false;
     document.getElementById('loginBtn').style.display = 'block';
   })
+
+/* --- Check Auth Status Function --- */
+async function checkAuthStatus() {
+  try {
+    const response = await fetch('/oauth2/userinfo');
+    return response.ok;
+  } catch (error) {
+    console.error('Auth check error:', error);
+    return false;
+  }
+}
 
 /* --- XSS Reflected Logic --- */
 // VULNERABILITY: Directly inserting user input without sanitization
@@ -251,6 +267,17 @@ async function sendChatMessage() {
   const message = chatbotInput.value.trim();
   // Allow sending if there's a file, even if message is empty
   if (!message && !currentFile) return;
+
+  // **AUTH CHECK: Verify user is logged in before proceeding**
+  const isAuthenticated = await checkAuthStatus();
+  
+  if (!isAuthenticated) {
+    // User is not logged in - show bot message asking them to log in
+    addChatMessage("🔒 Please log in to use the chatbot. Click the 'Login' button in the navigation menu above.", false);
+    chatbotInput.value = '';
+    clearFileSelection();
+    return;
+  }
 
   const fileName = currentFile ? currentFile.name : null;
   addChatMessage(message || (currentFile ? "Sent a file." : ""), true, fileName);
