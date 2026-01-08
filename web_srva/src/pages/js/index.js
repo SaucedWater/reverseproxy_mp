@@ -1,113 +1,21 @@
 /* --- Auth Check Logic --- */
-document.addEventListener('DOMContentLoaded', () => {
-  // First, check OAuth login status
-  checkOAuthLogin()
-    .then(oauthLoggedIn => {
-      if (oauthLoggedIn) {
-        // If OAuth login is successful, show logout, hide login
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'block';
-        showChatbot();  // Enable chatbot if logged in
-      } else {
-        // If OAuth login failed, check SQL login
-        checkSQLLogin()
-          .then(sqlLoggedIn => {
-            if (sqlLoggedIn) {
-              // If SQL login is successful, show logout, hide login
-              document.getElementById('loginBtn').style.display = 'none';
-              document.getElementById('logoutBtn').style.display = 'block';
-              showChatbot();  // Enable chatbot if logged in
-            } else {
-              // If both OAuth and SQL login failed, show login buttons and hide chatbot
-              document.getElementById('loginBtn').style.display = 'block';
-              document.getElementById('logoutBtn').style.display = 'none';
-              hideChatbot();  // Hide chatbot if not logged in
-            }
-          })
-          .catch(error => {
-            // Handle SQL login check failure
-            console.error('SQL login check error:', error);
-            document.getElementById('loginBtn').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'none';
-            hideChatbot();  // Hide chatbot if error occurs
-          });
-      }
-    })
-    .catch(error => {
-      // Handle OAuth check failure
-      console.error('OAuth check error:', error);
-      checkSQLLogin()
-        .then(sqlLoggedIn => {
-          if (sqlLoggedIn) {
-            document.getElementById('loginBtn').style.display = 'none';
-            document.getElementById('logoutBtn').style.display = 'block';
-            showChatbot();  // Enable chatbot if logged in
-          } else {
-            document.getElementById('loginBtn').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'none';
-            hideChatbot();  // Hide chatbot if not logged in
-          }
-        })
-        .catch(error => {
-          console.error('SQL login check error:', error);
-          document.getElementById('loginBtn').style.display = 'block';
-          document.getElementById('logoutBtn').style.display = 'none';
-          hideChatbot();  // Hide chatbot if error occurs
-        });
-    });
-});
-
-/* --- OAuth Login Check --- */
-function checkOAuthLogin() {
-  return new Promise((resolve, reject) => {
-    fetch('/oauth2/userinfo')
-      .then(response => {
-        if (response.ok) {
-          resolve(true);  // User is logged in via OAuth
-        } else {
-          resolve(false); // User is not logged in via OAuth
-        }
-      })
-      .catch(error => {
-        reject(error);  // Error with the OAuth request
-      });
-  });
-}
-
-/* --- SQL Login Check --- */
-function checkSQLLogin() {
-  return new Promise((resolve, reject) => {
-    fetch('/api/checkLogin', {
-      method: 'GET',
-      credentials: 'include'  // Include session cookie or JWT token
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.loggedIn) {
-          resolve(true);  // User is logged in via traditional SQL login
-        } else {
-          resolve(false);  // User is not logged in via SQL
-        }
-      })
-      .catch(error => {
-        reject(error);  // Error with the SQL login check
-      });
-  });
-}
-
-/* --- Chatbot Logic --- */
-function showChatbot() {
-  // Show the chatbot
-  const chatbot = document.getElementById('chatbotToggle');
-  chatbot.style.display = 'block';  // Or any other logic to display the chatbot
-}
-
-function hideChatbot() {
-  // Hide the chatbot
-  const chatbot = document.getElementById('chatbotToggle');
-  chatbot.style.display = 'none';  // Or any other logic to hide the chatbot
-}
-
+fetch('/oauth2/userinfo')
+  .then(response => {
+    if (response.ok) {
+      // If user is logged in, hide the Login button and show the Logout button
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'block';
+    } else {
+      // If user is not logged in, show the Login button and hide the Logout button
+      document.getElementById('loginBtn').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
+  })
+  .catch(error => {
+    // Handle errors if needed (e.g., API failure or other issues)
+    console.error('Authentication check error:', error);
+    document.getElementById('loginBtn').style.display = 'block';
+  })
 
 /* --- XSS Reflected Logic --- */
 // VULNERABILITY: Directly inserting user input without sanitization
