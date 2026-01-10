@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard</title>
+  
+</head>
+<body class="bg-gray-100">
+  <main class="max-w-2xl mx-auto p-8">
+    <h1 class="text-2xl font-bold">Dashboard (static)</h1>
+    <p class="mt-4">This is a static placeholder for the dashboard. The original server-side protected page at [web_srva/public/dashboard.php](web_srva/public/dashboard.php) was not provided, so server-side access control is not implemented here.</p>
+    <button id="logoutBtn" class="mt-6 px-4 py-2 bg-red-500 text-white rounded">Logout</button>
+  </main>
+
+  <script type="module" src="/js/auth.js"></script>
+  <script>
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      window.auth.logout();
+      window.location.href = 'login.html';
+    });
+  </script>
+</body>
+</html>
