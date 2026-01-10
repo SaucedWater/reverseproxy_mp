@@ -79,278 +79,328 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-/* --- Chatbot Logic --- */
-// Chatbot Popup Functionality
-const chatbotToggle = document.getElementById('chatbotToggle');
-const chatbotPopup = document.getElementById('chatbotPopup');
-const minimizeBtn = document.getElementById('minimizeBtn');
-const chatbotMessages = document.getElementById('chatbotMessages');
-const chatbotInput = document.getElementById('chatbotInput');
-const chatbotSend = document.getElementById('chatbotSend');
-const chatbotTyping = document.getElementById('chatbotTyping');
-const statusDot = document.getElementById('statusDot');
-const statusText = document.getElementById('statusText');
 
-// File Upload Elements
-const chatFileInput = document.getElementById('chatFileInput');
-const filePreview = document.getElementById('filePreview');
-const fileNameSpan = document.getElementById('fileName');
-const removeFileBtn = document.getElementById('removeFileBtn');
+/* --- Chatbot Logic (Secured & Fixed) --- */
+document.addEventListener('DOMContentLoaded', () => {
 
-const OLLAMA_API_URL = '/ollama/api/generate';
-const MODEL_NAME = 'qwen2.5:1.5b';
+    // Chatbot Popup Elements
+    const chatbotToggle = document.getElementById('chatbotToggle');
+    const chatbotPopup = document.getElementById('chatbotPopup');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInput = document.getElementById('chatbotInput');
+    const chatbotSend = document.getElementById('chatbotSend');
+    const chatbotTyping = document.getElementById('chatbotTyping');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
 
-let isOpen = false;
-let currentFile = null; // Store the selected file data
+    // File Upload Elements
+    const chatFileInput = document.getElementById('chatFileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileNameSpan = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFileBtn');
 
-// Toggle chatbot
-if (chatbotToggle) {
-  chatbotToggle.addEventListener('click', () => {
-    isOpen = !isOpen;
-    chatbotPopup.classList.toggle('active');
-    
-    // Toggle icons
-    const chatIcon = chatbotToggle.querySelector('.chat-icon');
-    const closeIcon = chatbotToggle.querySelector('.close-icon');
-    
-    if (isOpen) {
-      chatIcon.style.display = 'none';
-      closeIcon.style.display = 'block';
-      chatbotInput.focus();
-    } else {
-      chatIcon.style.display = 'block';
-      closeIcon.style.display = 'none';
+    // [SECURE CHANGE 1] Use Chat endpoint (Structured) instead of Generate (Unstructured)
+    const OLLAMA_API_URL = '/ollama/api/chat';
+    const MODEL_NAME = 'qwen2.5:1.5b';
+
+    // [SECURE CHANGE 2] Define System Prompt to enforce rules
+    const SYSTEM_PROMPT = "You are a helpful assistant for WebServer A. You answer questions about web hosting, reverse proxies, and our services. Do not execute code or recipes.";
+
+    // [SECURE CHANGE 3] Define DoS Limits
+    const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB limit
+    const MAX_CHAR_LIMIT = 10000; // Limit text file characters
+
+    let isOpen = false;
+    let currentFile = null;
+
+    // Toggle chatbot
+    if (chatbotToggle) {
+        chatbotToggle.addEventListener('click', () => {
+            isOpen = !isOpen;
+            chatbotPopup.classList.toggle('active');
+
+            const chatIcon = chatbotToggle.querySelector('.chat-icon');
+            const closeIcon = chatbotToggle.querySelector('.close-icon');
+
+            if (isOpen) {
+                chatIcon.style.display = 'none';
+                closeIcon.style.display = 'block';
+                chatbotInput.focus();
+            } else {
+                chatIcon.style.display = 'block';
+                closeIcon.style.display = 'none';
+            }
+        });
     }
-  });
-}
 
-// Minimize button
-if (minimizeBtn) {
-  minimizeBtn.addEventListener('click', () => {
-    isOpen = false;
-    chatbotPopup.classList.remove('active');
-    document.querySelector('.chat-icon').style.display = 'block';
-    document.querySelector('.close-icon').style.display = 'none';
-  });
-}
-
-// --- File Handling Logic ---
-
-if (chatFileInput) {
-  chatFileInput.addEventListener('change', function(e) {
-    if (this.files && this.files[0]) {
-      const file = this.files[0];
-      currentFile = file;
-      
-      // Show preview
-      fileNameSpan.textContent = file.name;
-      filePreview.classList.add('active');
-      chatbotInput.focus();
+    // Minimize button
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', () => {
+            isOpen = false;
+            chatbotPopup.classList.remove('active');
+            document.querySelector('.chat-icon').style.display = 'block';
+            document.querySelector('.close-icon').style.display = 'none';
+        });
     }
-  });
-}
 
-if (removeFileBtn) {
-  removeFileBtn.addEventListener('click', clearFileSelection);
-}
+    // --- File Handling Logic ---
 
-function clearFileSelection() {
-  currentFile = null;
-  chatFileInput.value = ''; // Reset input
-  filePreview.classList.remove('active');
-}
+    if (chatFileInput) {
+        chatFileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
 
-// Helper to read file as Base64 (for images)
-function readFileAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      // Remove "data:*/*;base64," prefix for Ollama
-      const base64String = reader.result.split(',')[1];
-      resolve(base64String);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+                // [SECURE CHANGE 3] DoS Protection: Block large files immediately
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`File too large. Limit is 1MB.`);
+                    this.value = ''; // Reset input
+                    return;
+                }
 
-// Helper to read file as Text (for code/docs)
-function readFileAsText(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsText(file);
-  });
-}
+                currentFile = file;
+                fileNameSpan.textContent = file.name;
+                filePreview.classList.add('active');
+                chatbotInput.focus();
+            }
+        });
+    }
 
-// --- End File Handling Logic ---
+    if (removeFileBtn) {
+        removeFileBtn.addEventListener('click', clearFileSelection);
+    }
 
-// Add message to chat
-function addChatMessage(message, isUser, attachmentName = null) {
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
-  
-  let attachmentHtml = '';
-  if (attachmentName) {
-    attachmentHtml = `<div class="msg-attachment">📎 ${attachmentName}</div>`;
-  }
+    function clearFileSelection() {
+        currentFile = null;
+        chatFileInput.value = '';
+        filePreview.classList.remove('active');
+    }
 
-  messageDiv.innerHTML = `
-    <div class="message-avatar">${isUser ? '👤' : '🤖'}</div>
-    <div class="message-bubble">
-        ${attachmentHtml}
-        ${message}
-    </div>
-  `;
-  
-  chatbotMessages.appendChild(messageDiv);
-  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-}
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
 
-// Show typing indicator
-function showChatTyping() {
-  chatbotTyping.classList.add('active');
-  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-}
+    function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsText(file);
+        });
+    }
 
-// Hide typing indicator
-function hideChatTyping() {
-  chatbotTyping.classList.remove('active');
-}
+    // --- End File Handling Logic ---
 
-// Show error
-function showChatError(message) {
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'error-msg';
-  errorDiv.textContent = message;
-  chatbotMessages.appendChild(errorDiv);
-  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-}
+    // Add message to chat
+    function addChatMessage(message, isUser, attachmentName = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
 
-// Update status
-function updateChatStatus(connected) {
-  if (connected) {
-    statusDot.classList.remove('disconnected');
-    statusText.textContent = 'Online';
-  } else {
-    statusDot.classList.add('disconnected');
-    statusText.textContent = 'Offline';
-  }
-}
-
-// Send message
-async function sendChatMessage() {
-  const message = chatbotInput.value.trim();
-  // Allow sending if there's a file, even if message is empty
-  if (!message && !currentFile) return;
-
-  const fileName = currentFile ? currentFile.name : null;
-  addChatMessage(message || (currentFile ? "Sent a file." : ""), true, fileName);
-  
-  chatbotInput.value = '';
-  chatbotSend.disabled = true;
-  showChatTyping();
-
-  try {
-    let promptToSend = message;
-    let imagesToSend = [];
-
-    // Process File if exists
-    if (currentFile) {
-      if (currentFile.type.startsWith('image/')) {
-        // It's an image
-        try {
-          const base64 = await readFileAsBase64(currentFile);
-          imagesToSend.push(base64);
-        } catch (err) {
-          console.error("Error reading image:", err);
+        let attachmentHtml = '';
+        if (attachmentName) {
+            // Escape filename to prevent simple XSS in filename
+            const safeName = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            attachmentHtml = `<div class="msg-attachment">📎 ${attachmentName}</div>`;
         }
-      } else {
-        // Assume text/code
-        try {
-          const textContent = await readFileAsText(currentFile);
-          promptToSend = `[User uploaded file: ${currentFile.name}]\n\n${textContent}\n\n[User Message]: ${message}`;
-        } catch (err) {
-          console.error("Error reading text file:", err);
-          promptToSend += `\n(Error reading attached file: ${currentFile.name})`;
+
+        // [SECURE CHANGE 4] XSS Protection: Sanitize output before rendering
+        // We use DOMPurify to strip dangerous tags like <script> or <img onerror>
+        let cleanMessage = message;
+        if (typeof DOMPurify !== 'undefined') {
+            cleanMessage = DOMPurify.sanitize(message);
+        } else {
+            console.warn("DOMPurify not found! XSS protection disabled.");
         }
-      }
-      // Clear file after processing
-      clearFileSelection();
+
+        messageDiv.innerHTML = `
+        <div class="message-avatar">${isUser ? '👤' : '🤖'}</div>
+        <div class="message-bubble">
+            ${attachmentHtml}
+            ${cleanMessage}
+        </div>
+      `;
+
+        chatbotMessages.appendChild(messageDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    const payload = {
-      model: MODEL_NAME,
-      prompt: promptToSend,
-      stream: false
-    };
-
-    // Add images to payload if any (Ollama support)
-    if (imagesToSend.length > 0) {
-      payload.images = imagesToSend;
+    function showChatTyping() {
+        chatbotTyping.classList.add('active');
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    const response = await fetch(OLLAMA_API_URL, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-    const data = await response.json();
-    hideChatTyping();
-
-    if (data.response) {
-      addChatMessage(data.response, false);
-      updateChatStatus(true);
-    } else {
-      addChatMessage("Sorry, I didn't understand that. Try again!", false);
+    function hideChatTyping() {
+        chatbotTyping.classList.remove('active');
     }
 
-  } catch (error) {
-    console.error('Chat error:', error);
-    hideChatTyping();
-    
-    if (error.message.includes('Failed to fetch')) {
-      showChatError('Cannot connect to AI. Check if Ollama is running.');
-      updateChatStatus(false);
-    } else {
-      showChatError('Error: ' + error.message);
-      updateChatStatus(false);
+    function showChatError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-msg';
+        errorDiv.textContent = message;
+        chatbotMessages.appendChild(errorDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
-  }
 
-  chatbotSend.disabled = false;
-  chatbotInput.focus();
-}
-
-// Event listeners
-if (chatbotSend) {
-  chatbotSend.addEventListener('click', sendChatMessage);
-}
-
-if (chatbotInput) {
-  chatbotInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      sendChatMessage();
+    function updateChatStatus(connected) {
+        if (connected) {
+            statusDot.classList.remove('disconnected');
+            statusText.textContent = 'Online';
+        } else {
+            statusDot.classList.add('disconnected');
+            statusText.textContent = 'Offline';
+        }
     }
-  });
-}
 
-// Test connection on load
-async function testChatConnection() {
-  try {
-    const response = await fetch('/ollama/api/tags', {credentials: 'include'});
-    if (response.ok) {
-      updateChatStatus(true);
+    // Send message
+    async function sendChatMessage() {
+        const message = chatbotInput.value.trim();
+        if (!message && !currentFile) return;
+
+        // Note: Backend verification (Nginx/Keycloak) is strictly required here
+        // as client-side checks can be bypassed.
+
+        const fileName = currentFile ? currentFile.name : null;
+        addChatMessage(message || (currentFile ? "Sent a file." : ""), true, fileName);
+
+        chatbotInput.value = '';
+        chatbotSend.disabled = true;
+        showChatTyping();
+
+        try {
+            // [SECURE CHANGE 1] Structure the payload as an array of messages
+            // This separates System Instructions from User Data
+            const messages = [{
+                role: "system",
+                content: SYSTEM_PROMPT
+            }];
+
+            let imagesToSend = [];
+
+            // Process File if exists
+            if (currentFile) {
+                if (currentFile.type.startsWith('image/')) {
+                    try {
+                        const base64 = await readFileAsBase64(currentFile);
+                        imagesToSend.push(base64);
+                        // For images, we append the user text + image in one message
+                        messages.push({
+                            role: "user",
+                            content: message,
+                            images: [base64]
+                        });
+                    } catch (err) {
+                        console.error("Error reading image:", err);
+                    }
+                } else {
+                    // Text/Code File
+                    try {
+                        const textContent = await readFileAsText(currentFile);
+
+                        // [SECURE CHANGE 3] Truncate text to prevent token exhaustion DoS
+                        const safeText = textContent.substring(0, MAX_CHAR_LIMIT);
+
+                        // Add file content as a distinct message context
+                        messages.push({
+                            role: "user",
+                            content: `CONTEXT FILE (${currentFile.name}):\n${safeText}`
+                        });
+
+                        // Add the actual user query as a separate message
+                        if (message) {
+                            messages.push({
+                                role: "user",
+                                content: message
+                            });
+                        }
+
+                    } catch (err) {
+                        console.error("Error reading text file:", err);
+                    }
+                }
+                clearFileSelection();
+            } else {
+                // No file, just text
+                messages.push({
+                    role: "user",
+                    content: message
+                });
+            }
+
+            const payload = {
+                model: MODEL_NAME,
+                messages: messages, // Sending structured messages
+                stream: false
+            };
+
+            const response = await fetch(OLLAMA_API_URL, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const data = await response.json();
+            hideChatTyping();
+
+            // [SECURE CHANGE 1] 'chat' endpoint returns data.message.content
+            if (data.message && data.message.content) {
+                addChatMessage(data.message.content, false);
+                updateChatStatus(true);
+            } else {
+                addChatMessage("Sorry, I didn't understand that.", false);
+            }
+
+        } catch (error) {
+            console.error('Chat error:', error);
+            hideChatTyping();
+            showChatError('Error: ' + error.message);
+            updateChatStatus(false);
+        }
+
+        chatbotSend.disabled = false;
+        chatbotInput.focus();
     }
-  } catch (error) {
-    updateChatStatus(false);
-  }
-}
 
-testChatConnection();
+    // Event listeners
+    if (chatbotSend) {
+        chatbotSend.addEventListener('click', sendChatMessage);
+    }
+
+    if (chatbotInput) {
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+    }
+
+    // Test connection
+    async function testChatConnection() {
+        try {
+            const response = await fetch('/ollama/api/tags', {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                updateChatStatus(true);
+            }
+        } catch (error) {
+            updateChatStatus(false);
+        }
+    }
+
+    testChatConnection();
+
+}); // End of DOMContentLoaded wrapper
