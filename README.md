@@ -1,5 +1,5 @@
 # Deployment Guide/ Set Up Guide
-
+13 jan 2026 - last checked
 Note: ctrl + shift + v to read this in markdown format
 
 ## First time? - Follow This!
