@@ -7,76 +7,10 @@ last upd: 15 jan 2026
 -->
 
 <group name="local,syslog,sshd,">
-
-  <!-- =========================================================
-       2) MODSECURITY BLOCK (PARENT)
-       Matches the actual log text you posted:
-       "ModSecurity: Access denied with code 403"
-       ========================================================= -->
-	<rule id="100100" level="10">
-	<if_sid>31333</if_sid>
-    <description>WAF: ModSecurity detected something SUSPICIOUS.</description>
+  <rule id="100100" level="10">
+    <if_sid>31333</if_sid>
+    <description>WAF: ModSecurity denied a request (Generic).</description>
     <group>web,access_denied,modsecurity,nginx,</group>
-  </rule>
-
-  <!-- =========================================================
-       3) SQLi CLASSIFICATION (CHILD)
-       Your audit log contains:
-       [id "942100"] and [tag "attack-sqli"]
-       Prefer tag-based match (more portable across CRS versions).
-       ========================================================= -->
-  <rule id="100101" level="12">
-    <match>tag "attack-sqli"|\\[id "942100"\\]|SQL Injection Attack Detected</match>
-    <description>WAF: SQL Injection Detected (OWASP CRS)</description>
-    <mitre>
-        <id>T1190</id>
-    </mitre>
-    <group>web,attack,sql_injection,modsecurity,</group>
-  </rule>
-
-
-  <!-- =========================================================
-       4) XSS CLASSIFICATION (CHILD)
-       OWASP CRS commonly uses tag "attack-xss".
-       Keep multiple indicators for resilience.
-       ========================================================= -->
-  <rule id="100102" level="12">
-  <match>tag "attack-xss"|Cross-site Scripting|XSS Attack</match>
-  <description>WAF: XSS Detected (OWASP CRS)</description>
-  <mitre>
-    <id>T1059.007</id>
-  </mitre>
-  <group>web,attack,xss,modsecurity,</group>
-</rule>
-
-
-  <!-- =========================================================
-       5) PATH TRAVERSAL / FILE ACCESS ATTEMPTS (CHILD)
-       CRS tags vary: attack-lfi / attack-rfi are common.
-       Also keep /etc/passwd as a demo-friendly indicator.
-       ========================================================= -->
-  <rule id="100103" level="12">
-    <if_sid>100100</if_sid>
-    <match>tag "attack-lfi"|tag "attack-rfi"|Directory Traversal|Path Traversal|/etc/passwd|/boot.ini</match>
-    <description>WAF: Path Traversal / File Access Attempt Detected</description>
-    <mitre>
-      <id>T1083</id>
-    </mitre>
-    <group>web,attack,path_traversal,modsecurity,pci_dss_6.5.8,</group>
-  </rule>
-
-  <!-- =========================================================
-       6) BEHAVIORAL CORRELATION (DoS / automated attack)
-       Uses frequency+timeframe + same_srcip as documented.
-       ========================================================= -->
-  <rule id="100105" level="14" frequency="20" timeframe="10">
-    <if_matched_sid>100100</if_matched_sid>
-    <same_srcip />
-    <description>WAF: High-rate blocks from same IP (Potential Automated Attack / DoS)</description>
-    <mitre>
-      <id>T1498</id>
-    </mitre>
-    <group>web,dos,attack,modsecurity,</group>
   </rule>
 
 </group>
