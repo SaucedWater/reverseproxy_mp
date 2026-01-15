@@ -2,38 +2,20 @@
   ============================================================
   Local Custom Wazuh Rules (Major Project – Reverse Proxy SOC)
 Author: ian kwok
-last upd: 4 jan 2026
-  Fixes:
-  - Match OWASP CRS SQLi/XSS/Traversal via stable CRS tags / rule IDs
-  - Avoid fragile dependency on if_sid 31101 for ModSecurity blocks
-  - Use same_srcip for correlation (documented option)
+last upd: 15 jan 2026
   ============================================================
 -->
 
 <group name="local,syslog,sshd,">
 
   <!-- =========================================================
-       1) SSH AUTH FAILURE (demo-friendly)
-       NOTE: Hardcoded srcip is often a demo trap. Two options:
-       A) Set to your client IP
-       B) Remove <srcip> and rely on correlation rules (recommended)
-       ========================================================= -->
-  <rule id="100001" level="5">
-    <if_sid>5716</if_sid>
-    <!-- CHANGE THIS to your real client IP, e.g. 192.168.1.102 -->
-    <srcip>192.168.1.102</srcip>
-    <description>sshd: authentication failed from client IP (lab).</description>
-    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
-  </rule>
-
-  <!-- =========================================================
        2) MODSECURITY BLOCK (PARENT)
        Matches the actual log text you posted:
        "ModSecurity: Access denied with code 403"
        ========================================================= -->
-  <rule id="100100" level="10">
-    <match>ModSecurity: Access denied</match>
-    <description>WAF: ModSecurity Blocked a Request (403)</description>
+	<rule id="100100" level="10">
+	<if_sid>31333</if_sid>
+    <description>WAF: ModSecurity detected something SUSPICIOUS.</description>
     <group>web,access_denied,modsecurity,nginx,</group>
   </rule>
 
@@ -98,5 +80,3 @@ last upd: 4 jan 2026
   </rule>
 
 </group>
-
-
