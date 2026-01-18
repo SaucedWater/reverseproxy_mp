@@ -1,16 +1,47 @@
-<!--
-  ============================================================
-  Local Custom Wazuh Rules (Major Project – Reverse Proxy SOC)
-Author: ian kwok
-last upd: 15 jan 2026
-  ============================================================
--->
+<group name="modsecurity,final_project,">
 
-<group name="local,syslog,sshd,">
-  <rule id="100100" level="10">
-    <if_sid>31333</if_sid>
-    <description>WAF: ModSecurity denied a request (Generic).</description>
-    <group>web,access_denied,modsecurity,nginx,</group>
+  <rule id="100100" level="0">
+    <if_sid>31333, 30118</if_sid>
+    <description>Ignored: Generic ModSecurity Block</description>
+  </rule>
+
+  <rule id="100200" level="0">
+    <regex type="pcre2">"producer":\s*\{"modsecurity"</regex>
+    <description>ModSecurity Audit Log Event (Universal Match)</description>
+  </rule>
+
+  <rule id="100201" level="12">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"ruleId":"942\d{3}"</regex>
+    <description>WAF: SQL Injection Detected</description>
+    <group>web,sqli,attack,</group>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <rule id="100202" level="12">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"ruleId":"(?:932|944)\d{3}"</regex>
+    <description>WAF: Remote Command Execution (RCE) Attempt</description>
+    <group>web,rce,attack,</group>
+    <mitre>
+      <id>T1210</id>
+    </mitre>
+  </rule>
+
+  <rule id="100203" level="10">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"ruleId":"941\d{3}"</regex>
+    <description>WAF: XSS Attempt Detected</description>
+    <group>web,xss,attack,</group>
+  </rule>
+
+  <rule id="100206" level="12">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"ruleId":"949110"</regex>
+    <description>WAF: Critical Malicious Request Blocked</description>
+    <group>web,attack,blocked,</group>
   </rule>
 
 </group>
