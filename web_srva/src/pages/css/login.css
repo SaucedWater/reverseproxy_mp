@@ -176,11 +176,34 @@ main {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
   font-size: 1rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .submit-btn:hover {
   background: linear-gradient(to right, #2c3e50, #1e293b);
   transform: scale(1.05);
+}
+
+/* Keycloak Button Specific Styles */
+.keycloak-btn {
+  background: white;
+  color: #2c3e50;
+  border: 2px solid #e5e7eb;
+}
+
+.keycloak-btn:hover {
+  background: #f9fafb;
+  border-color: #3b5270;
+  transform: scale(1.02);
+}
+
+.keycloak-logo {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
 }
 
 /* Login Message */
