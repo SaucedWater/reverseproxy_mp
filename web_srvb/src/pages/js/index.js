@@ -1,0 +1,406 @@
+/* --- Auth Check Logic --- */
+fetch('/oauth2/userinfo')
+  .then(response => {
+    if (response.ok) {
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'block';
+    } else {
+      document.getElementById('loginBtn').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
+  });
+
+/* --- XSS Reflected Logic --- */
+// VULNERABILITY: Directly inserting user input without sanitization
+const urlParams = new URLSearchParams(window.location.search);
+const searchQuery = urlParams.get('search');
+if (searchQuery) {
+  // XSS VULNERABILITY - directly writing user input to innerHTML
+  document.getElementById('searchResults').innerHTML = 
+    `<p>You searched for: <strong>${searchQuery}</strong></p>`;
+}
+
+/* --- XSS Stored Logic --- */
+// Fake database (stored XSS demonstration)
+let messages = [];
+
+const contactForm = document.querySelector('#contact form');
+if (contactForm) {
+  contactForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const name = this.querySelector('input[type="text"]').value;
+    const email = this.querySelector('input[type="email"]').value;
+    const message = this.querySelector('textarea').value;
+
+    // VULNERABLE: Storing unsanitized inputs
+    messages.push({ name, email, message });
+
+    // Display messages
+    displayMessages();
+
+    this.reset();
+  });
+}
+
+function displayMessages() {
+  const formContainer = document.querySelector('.contact-form');
+
+  // Remove existing message area
+  const existing = document.querySelector('.message-display');
+  if (existing) existing.remove();
+
+  // Create new message container
+  const resultsDiv = document.createElement('div');
+  resultsDiv.className = 'message-display';
+  resultsDiv.innerHTML = `<h3>Recent Messages:</h3>`;
+
+  // XSS happens here (user input is inserted directly)
+  messages.forEach(msg => {
+    resultsDiv.innerHTML += `
+      <div class="message-item">
+        <p class="name">${msg.name}</p>
+        <p class="email">${msg.email}</p>
+        <p class="text">${msg.message}</p>
+      </div>
+    `;
+  });
+
+  formContainer.appendChild(resultsDiv);
+}
+
+/* --- Smooth Scroll Logic --- */
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    document.querySelector(this.getAttribute('href')).scrollIntoView({
+      behavior: 'smooth'
+    });
+  });
+});
+
+
+/* --- Chatbot Logic (Secured & Fixed) --- */
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Chatbot Popup Elements
+    const chatbotToggle = document.getElementById('chatbotToggle');
+    const chatbotPopup = document.getElementById('chatbotPopup');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInput = document.getElementById('chatbotInput');
+    const chatbotSend = document.getElementById('chatbotSend');
+    const chatbotTyping = document.getElementById('chatbotTyping');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+
+    // File Upload Elements
+    const chatFileInput = document.getElementById('chatFileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileNameSpan = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+
+    // [SECURE CHANGE 1] Use Chat endpoint (Structured) instead of Generate (Unstructured)
+    const OLLAMA_API_URL = '/ollama/api/chat';
+    const MODEL_NAME = 'qwen2.5:1.5b';
+
+    // [SECURE CHANGE 2] Define System Prompt to enforce rules
+    const SYSTEM_PROMPT = "You are a helpful assistant for WebServer A. You answer questions about web hosting, reverse proxies, and our services. Do not execute code or recipes.";
+
+    // [SECURE CHANGE 3] Define DoS Limits
+    const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB limit
+    const MAX_CHAR_LIMIT = 10000; // Limit text file characters
+
+    let isOpen = false;
+    let currentFile = null;
+
+    // Toggle chatbot
+    if (chatbotToggle) {
+        chatbotToggle.addEventListener('click', () => {
+            isOpen = !isOpen;
+            chatbotPopup.classList.toggle('active');
+
+            const chatIcon = chatbotToggle.querySelector('.chat-icon');
+            const closeIcon = chatbotToggle.querySelector('.close-icon');
+
+            if (isOpen) {
+                chatIcon.style.display = 'none';
+                closeIcon.style.display = 'block';
+                chatbotInput.focus();
+            } else {
+                chatIcon.style.display = 'block';
+                closeIcon.style.display = 'none';
+            }
+        });
+    }
+
+    // Minimize button
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', () => {
+            isOpen = false;
+            chatbotPopup.classList.remove('active');
+            document.querySelector('.chat-icon').style.display = 'block';
+            document.querySelector('.close-icon').style.display = 'none';
+        });
+    }
+
+    // --- File Handling Logic ---
+
+    if (chatFileInput) {
+        chatFileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+
+                // [SECURE CHANGE 3] DoS Protection: Block large files immediately
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`File too large. Limit is 1MB.`);
+                    this.value = ''; // Reset input
+                    return;
+                }
+
+                currentFile = file;
+                fileNameSpan.textContent = file.name;
+                filePreview.classList.add('active');
+                chatbotInput.focus();
+            }
+        });
+    }
+
+    if (removeFileBtn) {
+        removeFileBtn.addEventListener('click', clearFileSelection);
+    }
+
+    function clearFileSelection() {
+        currentFile = null;
+        chatFileInput.value = '';
+        filePreview.classList.remove('active');
+    }
+
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsText(file);
+        });
+    }
+
+    // --- End File Handling Logic ---
+
+    // Add message to chat
+    function addChatMessage(message, isUser, attachmentName = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+
+        let attachmentHtml = '';
+        if (attachmentName) {
+            // Escape filename to prevent simple XSS in filename
+            const safeName = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            attachmentHtml = `<div class="msg-attachment">📎 ${attachmentName}</div>`;
+        }
+
+        // [SECURE CHANGE 4] XSS Protection: Sanitize output before rendering
+        // We use DOMPurify to strip dangerous tags like <script> or <img onerror>
+        let cleanMessage = message;
+        if (typeof DOMPurify !== 'undefined') {
+            cleanMessage = DOMPurify.sanitize(message);
+        } else {
+            console.warn("DOMPurify not found! XSS protection disabled.");
+        }
+
+        messageDiv.innerHTML = `
+        <div class="message-avatar">${isUser ? '👤' : '🤖'}</div>
+        <div class="message-bubble">
+            ${attachmentHtml}
+            ${cleanMessage}
+        </div>
+      `;
+
+        chatbotMessages.appendChild(messageDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function showChatTyping() {
+        chatbotTyping.classList.add('active');
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function hideChatTyping() {
+        chatbotTyping.classList.remove('active');
+    }
+
+    function showChatError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-msg';
+        errorDiv.textContent = message;
+        chatbotMessages.appendChild(errorDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function updateChatStatus(connected) {
+        if (connected) {
+            statusDot.classList.remove('disconnected');
+            statusText.textContent = 'Online';
+        } else {
+            statusDot.classList.add('disconnected');
+            statusText.textContent = 'Offline';
+        }
+    }
+
+    // Send message
+    async function sendChatMessage() {
+        const message = chatbotInput.value.trim();
+        if (!message && !currentFile) return;
+
+        // Note: Backend verification (Nginx/Keycloak) is strictly required here
+        // as client-side checks can be bypassed.
+
+        const fileName = currentFile ? currentFile.name : null;
+        addChatMessage(message || (currentFile ? "Sent a file." : ""), true, fileName);
+
+        chatbotInput.value = '';
+        chatbotSend.disabled = true;
+        showChatTyping();
+
+        try {
+            // [SECURE CHANGE 1] Structure the payload as an array of messages
+            // This separates System Instructions from User Data
+            const messages = [{
+                role: "system",
+                content: SYSTEM_PROMPT
+            }];
+
+            let imagesToSend = [];
+
+            // Process File if exists
+            if (currentFile) {
+                if (currentFile.type.startsWith('image/')) {
+                    try {
+                        const base64 = await readFileAsBase64(currentFile);
+                        imagesToSend.push(base64);
+                        // For images, we append the user text + image in one message
+                        messages.push({
+                            role: "user",
+                            content: message,
+                            images: [base64]
+                        });
+                    } catch (err) {
+                        console.error("Error reading image:", err);
+                    }
+                } else {
+                    // Text/Code File
+                    try {
+                        const textContent = await readFileAsText(currentFile);
+
+                        // [SECURE CHANGE 3] Truncate text to prevent token exhaustion DoS
+                        const safeText = textContent.substring(0, MAX_CHAR_LIMIT);
+
+                        // Add file content as a distinct message context
+                        messages.push({
+                            role: "user",
+                            content: `CONTEXT FILE (${currentFile.name}):\n${safeText}`
+                        });
+
+                        // Add the actual user query as a separate message
+                        if (message) {
+                            messages.push({
+                                role: "user",
+                                content: message
+                            });
+                        }
+
+                    } catch (err) {
+                        console.error("Error reading text file:", err);
+                    }
+                }
+                clearFileSelection();
+            } else {
+                // No file, just text
+                messages.push({
+                    role: "user",
+                    content: message
+                });
+            }
+
+            const payload = {
+                model: MODEL_NAME,
+                messages: messages, // Sending structured messages
+                stream: false
+            };
+
+            const response = await fetch(OLLAMA_API_URL, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const data = await response.json();
+            hideChatTyping();
+
+            // [SECURE CHANGE 1] 'chat' endpoint returns data.message.content
+            if (data.message && data.message.content) {
+                addChatMessage(data.message.content, false);
+                updateChatStatus(true);
+            } else {
+                addChatMessage("Sorry, I didn't understand that.", false);
+            }
+
+        } catch (error) {
+            console.error('Chat error:', error);
+            hideChatTyping();
+            showChatError('Error: ' + error.message);
+            updateChatStatus(false);
+        }
+
+        chatbotSend.disabled = false;
+        chatbotInput.focus();
+    }
+
+    // Event listeners
+    if (chatbotSend) {
+        chatbotSend.addEventListener('click', sendChatMessage);
+    }
+
+    if (chatbotInput) {
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+    }
+
+    // Test connection
+    async function testChatConnection() {
+        try {
+            const response = await fetch('/ollama/api/tags', {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                updateChatStatus(true);
+            }
+        } catch (error) {
+            updateChatStatus(false);
+        }
+    }
+
+    testChatConnection();
+
+}); // End of DOMContentLoaded wrapper
