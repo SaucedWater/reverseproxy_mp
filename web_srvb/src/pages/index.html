@@ -5,24 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Web Server B</title>
   <link rel="stylesheet" href="css/index.css">
+  <script src="./js/purify.min.js"></script>
 </head>
 <body>
 
-  <script>
-    fetch('/oauth2/userinfo')
-      .then(response => {
-        if (response.ok) {
-          document.getElementById('loginBtn').style.display = 'none';
-          document.getElementById('logoutBtn').style.display = 'block';
-        } else {
-          document.getElementById('loginBtn').style.display = 'block';
-          document.getElementById('logoutBtn').style.display = 'none';
-        }
-      });
-  </script>
-  
-  
-  <!-- Navigation Bar -->
   <nav>
     <div class="nav-container">
       <h1 class="nav-logo">WebServerB</h1>
@@ -32,20 +18,19 @@
         <a href="#services">Services</a>
         <a href="#contact">Contact</a>
         <a href="/oauth2/sign_out?rd=https%3A%2F%2Fauth.dev.org%2Fauth%2Frealms%2Fdev-org%2Fprotocol%2Fopenid-connect%2Flogout%3Fclient_id%3Dproxy-server%26post_logout_redirect_uri%3Dhttps%3A%2F%2Fwww.dev.org%2Flogout.html" id="logoutBtn">Logout</a>
+        <a href="./login.html" id="loginBtn">Login</a>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
   <section id="home" class="hero">
     <div class="hero-container">
       <h2>Welcome to WebServer B</h2>
-      <p>Hello World! Web Server B</p>
-      <button>Get Started</button>
+      <p>Hello World! Welcome to Web Server B!</p>
+      <button>Get Started Below!</button>
     </div>
   </section>
 
-  <!-- Cross-site scripting (XSS) (Reflected/One time) -->
   <section class="search-section">
     <div class="section-container">
       <h3>Search Our Site</h3>
@@ -60,20 +45,6 @@
       <div id="searchResults"></div>
     </div>
   </section>
-
-  <script>
-    // VULNERABILITY: Directly inserting user input without sanitization
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search');
-    if (searchQuery) {
-      // XSS VULNERABILITY - directly writing user input to innerHTML
-      document.getElementById('searchResults').innerHTML = 
-        `<p>You searched for: <strong>${searchQuery}</strong></p>`;
-    }
-  </script>
-  <!-- Test with: ?search=<script>alert('XSS')</script> or ?search=<img src=x onerror=alert('XSS')> -->
-
-  <!-- About Section -->
   <section id="about" class="about-section">
     <div class="section-container">
       <div class="about-card">
@@ -81,16 +52,16 @@
         <div class="about-grid">
           <div class="about-text">
             <p>
-              Hi this is the details section about the website but i dont know what to put here.
+              We offer Reverse Proxy services using Keycloak for authentication and Grafana with Wazuh for dashboard visualization. 
             </p>
             <p>
-              Im just trying random things for now for the website
+              Do contact us for a quote!
             </p>
           </div>
           <div class="about-image">
             <img 
-              src="https://tfipost.com/wp-content/uploads/2022/04/Shinchan_in_hindi_dubbed_show.jpg" 
-              alt="random image"
+              src="./assets/temasek_logo.png"
+              alt="Logo"
             >
           </div>
         </div>
@@ -98,13 +69,11 @@
     </div>
   </section>
 
-  <!-- Services Section -->
   <section id="services" class="services-section">
     <div class="section-container">
       <h2>Our Services</h2>
       <div class="services-grid">
         
-        <!-- Service 1 -->
         <div class="service-card">
           <div class="icon">📱</div>
           <h3>Web Design</h3>
@@ -113,7 +82,6 @@
           </p>
         </div>
 
-        <!-- Service 2 -->
         <div class="service-card">
           <div class="icon">💻</div>
           <h3>Development</h3>
@@ -122,7 +90,6 @@
           </p>
         </div>
 
-        <!-- Service 3 -->
         <div class="service-card">
           <div class="icon">🚀</div>
           <h3>Deployment</h3>
@@ -134,7 +101,6 @@
     </div>
   </section>
 
-  <!-- Contact Section -->
   <section id="contact" class="contact-section">
     <div class="section-container">
       <div class="contact-card">
@@ -170,91 +136,20 @@
         </div>
       </div>
     </div>
-
-    <!-- Stored XSS Demo Script -->
-    <script>
-      // Fake database (stored XSS demonstration)
-      let messages = [];
-
-      document.querySelector('#contact form').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const name = this.querySelector('input[type="text"]').value;
-        const email = this.querySelector('input[type="email"]').value;
-        const message = this.querySelector('textarea').value;
-
-        // VULNERABLE: Storing unsanitized inputs
-        messages.push({ name, email, message });
-
-        // Display messages
-        displayMessages();
-
-        this.reset();
-      });
-
-      function displayMessages() {
-        const formContainer = document.querySelector('.contact-form');
-
-        // Remove existing message area
-        const existing = document.querySelector('.message-display');
-        if (existing) existing.remove();
-
-        // Create new message container
-        const resultsDiv = document.createElement('div');
-        resultsDiv.className = 'message-display';
-        resultsDiv.innerHTML = `<h3>Recent Messages:</h3>`;
-
-        // XSS happens here (user input is inserted directly)
-        messages.forEach(msg => {
-          resultsDiv.innerHTML += `
-            <div class="message-item">
-              <p class="name">${msg.name}</p>
-              <p class="email">${msg.email}</p>
-              <p class="text">${msg.message}</p>
-            </div>
-          `;
-        });
-
-        formContainer.appendChild(resultsDiv);
-      }
-    </script>
   </section>
 
-  <!-- TEST PAYLOAD
-  Name: <img src=x onerror=window.location='https://google.com'>
-  Email: test@test.com
-  Message: test
-  //If it brings you to google website it proves that XSS works
-  -->
-
-  <!-- Footer -->
   <footer>
     <div class="section-container">
       <p>&copy; MP 2025</p>
-      <p class="footer-subtitle">Made with HTML + CSS + JS</p>
+      <p class="footer-subtitle">Made with HTML + CSS + JS with MP Group No. 48</p>
     </div>
   </footer>
 
-  <script type="module" src="/js/auth.js"></script>
-  <script>
-    // Simple smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
-      });
-    });
-  </script>
-
-  <!-- Chatbot Popup Button -->
   <button id="chatbotToggle" class="chatbot-toggle">
     <span class="chat-icon">💬</span>
     <span class="close-icon" style="display: none;">✕</span>
   </button>
 
-  <!-- Chatbot Popup Container -->
   <div id="chatbotPopup" class="chatbot-popup">
     <div class="chatbot-header">
       <div class="chatbot-header-content">
@@ -283,183 +178,41 @@
       <span class="typing-dot"></span>
     </div>
 
-    <div class="chatbot-input-container">
-      <input 
-        type="text" 
-        id="chatbotInput" 
-        placeholder="Type your message..."
-        autocomplete="off"
-      >
-      <button id="chatbotSend">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 8L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+    <div class="chatbot-input-wrapper">
+      
+      <div id="filePreview" class="file-preview-area">
+        <div class="file-info">
+          <span>📎</span>
+          <span id="fileName">document.txt</span>
+        </div>
+        <button id="removeFileBtn" class="remove-file-btn" title="Remove file">×</button>
+      </div>
+
+      <div class="chatbot-input-container">
+        <input type="file" id="chatFileInput" style="display: none;">
+        
+        <label for="chatFileInput" class="chat-attach-label" title="Attach file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+          </svg>
+        </label>
+
+        <input 
+          type="text" 
+          id="chatbotInput" 
+          placeholder="Type your message..."
+          autocomplete="off"
+        >
+        <button id="chatbotSend">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 8L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
-  <script>
-    // Chatbot Popup Functionality
-    const chatbotToggle = document.getElementById('chatbotToggle');
-    const chatbotPopup = document.getElementById('chatbotPopup');
-    const minimizeBtn = document.getElementById('minimizeBtn');
-    const chatbotMessages = document.getElementById('chatbotMessages');
-    const chatbotInput = document.getElementById('chatbotInput');
-    const chatbotSend = document.getElementById('chatbotSend');
-    const chatbotTyping = document.getElementById('chatbotTyping');
-    const statusDot = document.getElementById('statusDot');
-    const statusText = document.getElementById('statusText');
-
-    const OLLAMA_API_URL = '/ollama/api/generate';
-    const MODEL_NAME = 'qwen2.5:1.5b';
-
-    let isOpen = false;
-
-    // Toggle chatbot
-    chatbotToggle.addEventListener('click', () => {
-      isOpen = !isOpen;
-      chatbotPopup.classList.toggle('active');
-      
-      // Toggle icons
-      const chatIcon = chatbotToggle.querySelector('.chat-icon');
-      const closeIcon = chatbotToggle.querySelector('.close-icon');
-      
-      if (isOpen) {
-        chatIcon.style.display = 'none';
-        closeIcon.style.display = 'block';
-        chatbotInput.focus();
-      } else {
-        chatIcon.style.display = 'block';
-        closeIcon.style.display = 'none';
-      }
-    });
-
-    // Minimize button
-    minimizeBtn.addEventListener('click', () => {
-      isOpen = false;
-      chatbotPopup.classList.remove('active');
-      document.querySelector('.chat-icon').style.display = 'block';
-      document.querySelector('.close-icon').style.display = 'none';
-    });
-
-    // Add message to chat
-    function addChatMessage(message, isUser) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
-      
-      messageDiv.innerHTML = `
-        <div class="message-avatar">${isUser ? '👤' : '🤖'}</div>
-        <div class="message-bubble">${message}</div>
-      `;
-      
-      chatbotMessages.appendChild(messageDiv);
-      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-
-    // Show typing indicator
-    function showChatTyping() {
-      chatbotTyping.classList.add('active');
-      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-
-    // Hide typing indicator
-    function hideChatTyping() {
-      chatbotTyping.classList.remove('active');
-    }
-
-    // Show error
-    function showChatError(message) {
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-msg';
-      errorDiv.textContent = message;
-      chatbotMessages.appendChild(errorDiv);
-      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-
-    // Update status
-    function updateChatStatus(connected) {
-      if (connected) {
-        statusDot.classList.remove('disconnected');
-        statusText.textContent = 'Online';
-      } else {
-        statusDot.classList.add('disconnected');
-        statusText.textContent = 'Offline';
-      }
-    }
-
-    // Send message
-    async function sendChatMessage() {
-      const message = chatbotInput.value.trim();
-      if (!message) return;
-
-      addChatMessage(message, true);
-      chatbotInput.value = '';
-      chatbotSend.disabled = true;
-      showChatTyping();
-
-      try {
-        const response = await fetch(OLLAMA_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: MODEL_NAME,
-            prompt: message,
-            stream: false
-          })
-        });
-
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
-        hideChatTyping();
-
-        if (data.response) {
-          addChatMessage(data.response, false);
-          updateChatStatus(true);
-        } else {
-          addChatMessage("Sorry, I didn't understand that. Try again!", false);
-        }
-
-      } catch (error) {
-        console.error('Chat error:', error);
-        hideChatTyping();
-        
-        if (error.message.includes('Failed to fetch')) {
-          showChatError('Cannot connect to AI. Check if Ollama is running.');
-          updateChatStatus(false);
-        } else {
-          showChatError('Error: ' + error.message);
-          updateChatStatus(false);
-        }
-      }
-
-      chatbotSend.disabled = false;
-      chatbotInput.focus();
-    }
-
-    // Event listeners
-    chatbotSend.addEventListener('click', sendChatMessage);
-    chatbotInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        sendChatMessage();
-      }
-    });
-
-    // Test connection on load
-    async function testChatConnection() {
-      try {
-        const response = await fetch('/ollama/api/tags');
-        if (response.ok) {
-          updateChatStatus(true);
-        }
-      } catch (error) {
-        updateChatStatus(false);
-      }
-    }
-
-    testChatConnection();
-  </script>
-
+  <script type="module" src="./js/auth.js"></script>
+  <script src="./js/index.js"></script>
 </body>
 </html>

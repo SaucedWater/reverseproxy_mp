@@ -9,7 +9,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #667eea 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #475569 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -32,7 +32,7 @@ main {
 
 /* Header Section */
 .login-header {
-  background: linear-gradient(to right, #9333ea, #4f46e5);
+  background: linear-gradient(to right, #3b5270, #2c3e50);
   padding: 2rem;
   text-align: center;
 }
@@ -51,7 +51,7 @@ main {
 .avatar svg {
   width: 3rem;
   height: 3rem;
-  color: #9333ea;
+  color: #3b5270;
 }
 
 .login-header h1 {
@@ -62,7 +62,7 @@ main {
 }
 
 .login-header p {
-  color: #ddd6fe;
+  color: #cbd5e1;
 }
 
 /* Form Section */
@@ -119,7 +119,7 @@ main {
 
 .form-input:focus {
   outline: none;
-  border-color: #9333ea;
+  border-color: #3b5270;
 }
 
 .form-input::placeholder {
@@ -153,21 +153,21 @@ main {
 }
 
 .forgot-password {
-  color: #9333ea;
+  color: #3b5270;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s;
 }
 
 .forgot-password:hover {
-  color: #7e22ce;
+  color: #2c3e50;
 }
 
 /* Submit Button */
 .submit-btn {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: linear-gradient(to right, #9333ea, #4f46e5);
+  background: linear-gradient(to right, #3b5270, #2c3e50);
   color: white;
   font-weight: bold;
   border: none;
@@ -176,11 +176,34 @@ main {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
   font-size: 1rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .submit-btn:hover {
-  background: linear-gradient(to right, #7e22ce, #4338ca);
+  background: linear-gradient(to right, #2c3e50, #1e293b);
   transform: scale(1.05);
+}
+
+/* Keycloak Button Specific Styles */
+.keycloak-btn {
+  background: white;
+  color: #2c3e50;
+  border: 2px solid #e5e7eb;
+}
+
+.keycloak-btn:hover {
+  background: #f9fafb;
+  border-color: #3b5270;
+  transform: scale(1.02);
+}
+
+.keycloak-logo {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
 }
 
 /* Login Message */
@@ -220,14 +243,14 @@ main {
 }
 
 .signup-link {
-  color: #9333ea;
+  color: #3b5270;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s;
 }
 
 .signup-link:hover {
-  color: #7e22ce;
+  color: #2c3e50;
 }
 
 /* Footer */
