@@ -8,6 +8,7 @@
   <script src="./js/purify.min.js"></script>
 </head>
 <body>
+  <script src="./js/check_login.js"></script>
 
   <nav>
     <div class="nav-container">
@@ -180,22 +181,7 @@
 
     <div class="chatbot-input-wrapper">
       
-      <div id="filePreview" class="file-preview-area">
-        <div class="file-info">
-          <span>📎</span>
-          <span id="fileName">document.txt</span>
-        </div>
-        <button id="removeFileBtn" class="remove-file-btn" title="Remove file">×</button>
-      </div>
-
       <div class="chatbot-input-container">
-        <input type="file" id="chatFileInput" style="display: none;">
-        
-        <label for="chatFileInput" class="chat-attach-label" title="Attach file">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-          </svg>
-        </label>
 
         <input 
           type="text" 

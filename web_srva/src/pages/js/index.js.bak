@@ -1,3 +1,14 @@
+/* --- Auth Check Logic --- */
+fetch('/oauth2/userinfo')
+  .then(response => {
+    if (response.ok) {
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'block';
+    } else {
+      document.getElementById('loginBtn').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
+  });
 
 /* --- XSS Reflected Logic --- */
 // VULNERABILITY: Directly inserting user input without sanitization
@@ -83,6 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
 
+    // File Upload Elements
+    const chatFileInput = document.getElementById('chatFileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileNameSpan = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFileBtn');
 
     // [SECURE CHANGE 1] Use Chat endpoint (Structured) instead of Generate (Unstructured)
     const OLLAMA_API_URL = '/ollama/api/chat';
@@ -128,6 +144,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- File Handling Logic ---
+
+    if (chatFileInput) {
+        chatFileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+
+                // [SECURE CHANGE 3] DoS Protection: Block large files immediately
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`File too large. Limit is 1MB.`);
+                    this.value = ''; // Reset input
+                    return;
+                }
+
+                currentFile = file;
+                fileNameSpan.textContent = file.name;
+                filePreview.classList.add('active');
+                chatbotInput.focus();
+            }
+        });
+    }
+
+    if (removeFileBtn) {
+        removeFileBtn.addEventListener('click', clearFileSelection);
+    }
+
+    function clearFileSelection() {
+        currentFile = null;
+        chatFileInput.value = '';
+        filePreview.classList.remove('active');
+    }
+
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsText(file);
+        });
+    }
+
+    // --- End File Handling Logic ---
 
     // Add message to chat
     function addChatMessage(message, isUser, attachmentName = null) {
@@ -211,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 role: "system",
                 content: SYSTEM_PROMPT
             }];
-	    const timestamp = Date.now();
 
             let imagesToSend = [];
 
