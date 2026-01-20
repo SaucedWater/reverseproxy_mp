@@ -1,14 +1,3 @@
-/* --- Auth Check Logic --- */
-fetch('/oauth2/userinfo')
-  .then(response => {
-    if (response.ok) {
-      document.getElementById('loginBtn').style.display = 'none';
-      document.getElementById('logoutBtn').style.display = 'block';
-    } else {
-      document.getElementById('loginBtn').style.display = 'block';
-      document.getElementById('logoutBtn').style.display = 'none';
-    }
-  });
 
 /* --- XSS Reflected Logic --- */
 // VULNERABILITY: Directly inserting user input without sanitization
@@ -78,6 +67,26 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
   });
 });
+/* AI SECURITY: Prompt Injection Guardrail */
+const PROMPT_INJECTION_PATTERNS = [
+  /ignore\s+previous\s+instructions/i,
+  /disregard\s+all\s+rules/i,
+  /system\s+prompt/i,
+  /act\s+as/i,
+  /you\s+are\s+now/i
+];
+
+function isPromptInjection(input) {
+  return PROMPT_INJECTION_PATTERNS.some(pattern => pattern.test(input));
+}
+
+// AI SECURITY: Anti-crash input limit
+const MAX_USER_INPUT_LENGTH = 500;
+
+// AI SECURITY: Client-side rate limiting
+const CHAT_RATE_LIMIT = 5; // messages
+const CHAT_RATE_WINDOW_MS = 10_000; // 10 seconds
+let chatTimestamps = [];
 
 
 /* --- Chatbot Logic (Secured & Fixed) --- */
@@ -94,11 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
 
-    // File Upload Elements
-    const chatFileInput = document.getElementById('chatFileInput');
-    const filePreview = document.getElementById('filePreview');
-    const fileNameSpan = document.getElementById('fileName');
-    const removeFileBtn = document.getElementById('removeFileBtn');
 
     // [SECURE CHANGE 1] Use Chat endpoint (Structured) instead of Generate (Unstructured)
     const OLLAMA_API_URL = '/ollama/api/chat';
@@ -144,60 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- File Handling Logic ---
-
-    if (chatFileInput) {
-        chatFileInput.addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                const file = this.files[0];
-
-                // [SECURE CHANGE 3] DoS Protection: Block large files immediately
-                if (file.size > MAX_FILE_SIZE) {
-                    alert(`File too large. Limit is 1MB.`);
-                    this.value = ''; // Reset input
-                    return;
-                }
-
-                currentFile = file;
-                fileNameSpan.textContent = file.name;
-                filePreview.classList.add('active');
-                chatbotInput.focus();
-            }
-        });
-    }
-
-    if (removeFileBtn) {
-        removeFileBtn.addEventListener('click', clearFileSelection);
-    }
-
-    function clearFileSelection() {
-        currentFile = null;
-        chatFileInput.value = '';
-        filePreview.classList.remove('active');
-    }
-
-    function readFileAsBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const base64String = reader.result.split(',')[1];
-                resolve(base64String);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function readFileAsText(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsText(file);
-        });
-    }
-
-    // --- End File Handling Logic ---
 
     // Add message to chat
     function addChatMessage(message, isUser, attachmentName = null) {
@@ -262,6 +212,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Send message
     async function sendChatMessage() {
         const message = chatbotInput.value.trim();
+        // AI SECURITY: Block prompt injection
+        if (isPromptInjection(message)) {
+            showChatError("Prompt injection attempt blocked.");
+            return;
+        }
+        // AI SECURITY: Prevent oversized input crashes
+        if (message.length > MAX_USER_INPUT_LENGTH) {
+            showChatError("Message too long. Anti-crash protection triggered.");
+            return;
+        }
+
+        // AI SECURITY: Rate limit enforcement
+        const now = Date.now();
+        chatTimestamps = chatTimestamps.filter(
+            ts => now - ts < CHAT_RATE_WINDOW_MS
+        );
+
+        if (chatTimestamps.length >= CHAT_RATE_LIMIT) {
+            showChatError("Rate limit exceeded. Please slow down.");
+            return;
+        }
+
+        chatTimestamps.push(now);
+
         if (!message && !currentFile) return;
 
         // Note: Backend verification (Nginx/Keycloak) is strictly required here
@@ -281,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 role: "system",
                 content: SYSTEM_PROMPT
             }];
+	    const timestamp = Date.now();
 
             let imagesToSend = [];
 
@@ -339,20 +314,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 messages: messages, // Sending structured messages
                 stream: false
             };
+            // AI SECURITY: Prevent hanging AI requests
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
 
             const response = await fetch(OLLAMA_API_URL, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+		    'X-Request-Timestamp': timestamp.toString()
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                signal: controller.signal
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const data = await response.json();
+            clearTimeout(timeoutId);
             hideChatTyping();
+            // AI SECURITY: Validate AI response before rendering
+            if (
+                !data.message ||
+                typeof data.message.content !== 'string' ||
+                data.message.content.length > 2000
+            ) {
+                showChatError("Unsafe AI response blocked.");
+                return;
+            }
 
             // [SECURE CHANGE 1] 'chat' endpoint returns data.message.content
             if (data.message && data.message.content) {
@@ -365,7 +355,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Chat error:', error);
             hideChatTyping();
-            showChatError('Error: ' + error.message);
+            if (error.name === 'AbortError') {
+                showChatError('AI request timed out (DoS protection)');
+            } else {
+                showChatError('Chatbot error: ' + error.message);
+            }
             updateChatStatus(false);
         }
 
