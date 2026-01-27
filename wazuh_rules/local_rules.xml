@@ -13,7 +13,7 @@
   <rule id="100201" level="12">
     <if_sid>100200</if_sid>
     <regex type="pcre2">"ruleId":"942\d{3}"</regex>
-    <description>WAF: SQL Injection Detected</description>
+    <description>MP WAF: SQL Injection Detected</description>
     <group>web,sqli,attack,</group>
     <mitre>
       <id>T1190</id>
@@ -23,25 +23,64 @@
   <rule id="100202" level="12">
     <if_sid>100200</if_sid>
     <regex type="pcre2">"ruleId":"(?:932|944)\d{3}"</regex>
-    <description>WAF: Remote Command Execution (RCE) Attempt</description>
+    <description>MP WAF: Remote Command Execution (RCE) Attempt</description>
     <group>web,rce,attack,</group>
     <mitre>
       <id>T1210</id>
     </mitre>
   </rule>
 
-  <rule id="100203" level="10">
+  <rule id="100203" level="12">
     <if_sid>100200</if_sid>
     <regex type="pcre2">"ruleId":"941\d{3}"</regex>
-    <description>WAF: XSS Attempt Detected</description>
+    <description>MP WAF: XSS Attempt Detected</description>
     <group>web,xss,attack,</group>
   </rule>
 
-  <rule id="100206" level="12">
+  <rule id="100204" level="12">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"ruleId":"913\d{3}"</regex>
+    <description>MP WAF: Security Scanner/Bot Detected (Nikto/sqlmap)</description>
+    <group>web,scanner,attack,</group>
+    <mitre>
+      <id>T1595</id>
+    </mitre>
+  </rule>
+
+  <rule id="100205" level="12">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"ruleId":"930\d{3}"</regex>
+    <description>MP WAF: Path Traversal/LFI Attempt</description>
+    <group>web,lfi,attack,</group>
+    <mitre>
+      <id>T1083</id>
+    </mitre>
+  </rule>
+
+  <rule id="100206" level="11">
     <if_sid>100200</if_sid>
     <regex type="pcre2">"ruleId":"949110"</regex>
-    <description>WAF: Critical Malicious Request Blocked</description>
+    <description>MP WAF: Critical Malicious Request Blocked</description>
     <group>web,attack,blocked,</group>
   </rule>
 
+  <rule id="100207" level="12">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"ruleId":"100005"</regex>
+    <description>MP WAF: AI Prompt Injection Detected</description>
+    <group>web,llm,injection,attack,</group>
+    <mitre>
+      <id>T1598</id>
+    </mitre>
+  </rule>
+
+</group>
+
+<group name="ai_integration">
+  <rule id="100001" level="10">
+    <decoded_as>json</decoded_as>
+    <field name="integration">ollama</field>
+    <description>AI Incident Analysis: $(ai_analysis)</description>
+    <options>no_full_log</options>
+  </rule>
 </group>
