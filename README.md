@@ -35,7 +35,7 @@ The following technologies are utilized in this deployment:
 ---
 
 ## 🏗️ System Architecture
-*Current planned architecture as of 22/12/2025.*
+*Current planned architecture as of 4/2/2026.*
 
 ![System Architecture Diagram](highlevelArchi.png)
 
