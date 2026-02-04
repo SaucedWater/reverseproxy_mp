@@ -36,7 +36,7 @@
     <description>MP WAF: XSS Attempt Detected</description>
     <group>web,xss,attack,</group>
     <mitre>
-	<id>T1190</id>
+	<id>T1059.007</id>
     </mitre>
   </rule>
 
@@ -50,7 +50,7 @@
     </mitre>
   </rule>
 
-  <!-- <rule id="100205" level="12">
+  <rule id="100205" level="12">
     <if_sid>100200</if_sid>
     <regex type="pcre2">"ruleId":"930\d{3}"</regex>
     <description>MP WAF: Path Traversal/LFI Attempt</description>
@@ -58,7 +58,7 @@
     <mitre>
       <id>T1083</id>
     </mitre>
-  </rule> -->
+  </rule>
 
   <rule id="100206" level="11">
     <if_sid>100200</if_sid>
@@ -87,6 +87,24 @@
     </mitre>
   </rule>
 
+  <rule id="100209" level="12">
+    <if_sid>100200</if_sid>
+    <regex type="pcre2">"uri":"/ollama/api/generate".*"http_code":401</regex>
+    <description>MP WAF: Replay Attack / Unauthorized API Request Detected</description>
+    <group>web,replay,attack,</group>
+    <mitre>
+      <id>T1550</id> </mitre>
+  </rule>
+
+  <rule id="100209" level="14" frequency="3" timeframe="60">
+    <if_matched_sid>100209</if_matched_sid>
+    <same_source_ip />
+    <description>MP WAF: DDoS Flood or Brute Force Detected (High Volume of 401s)</description>
+    <group>web,ddos,attack,pci_dss_11.4,</group>
+    <mitre>
+      <id>T1498</id> </mitre>
+  </rule>
+
 </group>
 
 <group name="ai_integration">
@@ -97,4 +115,3 @@
     <options>no_full_log</options>
   </rule>
 </group>
-
