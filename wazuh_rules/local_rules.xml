@@ -96,7 +96,7 @@
       <id>T1550</id> </mitre>
   </rule>
 
-  <rule id="100209" level="14" frequency="3" timeframe="60">
+  <rule id="100210" level="14" frequency="3" timeframe="60">
     <if_matched_sid>100209</if_matched_sid>
     <same_source_ip />
     <description>MP WAF: DDoS Flood or Brute Force Detected (High Volume of 401s)</description>
