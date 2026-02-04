@@ -50,16 +50,6 @@
     </mitre>
   </rule>
 
-  <rule id="100205" level="12">
-    <if_sid>100200</if_sid>
-    <regex type="pcre2">"ruleId":"930\d{3}"</regex>
-    <description>MP WAF: Path Traversal/LFI Attempt</description>
-    <group>web,lfi,attack,</group>
-    <mitre>
-      <id>T1083</id>
-    </mitre>
-  </rule>
-
   <rule id="100206" level="11">
     <if_sid>100200</if_sid>
     <regex type="pcre2">"ruleId":"949110"</regex>
